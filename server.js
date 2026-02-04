@@ -38,10 +38,7 @@ app.post("/checkout", async (req, res) => {
           quantity: 1,
         },
       ],
-      mode: "payment",
-      success_url: `${process.env.PUBLIC_URL}/success.html`,
-      cancel_url: `${process.env.PUBLIC_URL}/cart.html`,
-    });
+      
 
     res.json({ url: session.url });
   } catch (err) {
