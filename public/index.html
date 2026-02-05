@@ -95,7 +95,8 @@
 
     .info-box p {
       color: cadetblue;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+  line-height: 1.6;
     }
 
     .big-number {
@@ -144,17 +145,27 @@
 
     /* ===== POPUP ===== */
     #popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgb(94, 0, 0);
-      padding: 25px;
-      border-radius: 15px;
-      display: none;
-      z-index: 100;
-      max-width: 90%;
-    }
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgb(94, 0, 0);
+  padding: 40px;
+  border-radius: 20px;
+  display: none;
+  z-index: 100;
+  max-width: 800px;
+  width: 90%;
+
+}
+#popup h3 {
+  font-size: 1.1rem;
+  font-weight: normal;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 
     #popup button {
       margin-top: 15px;
@@ -232,8 +243,9 @@
 
 <div id="popup">
   <h3>Informacje dotyczące wysyłki</h3>
-  <p>W przypadku opóźnień wysyłki wysyłamy kod rabatowy.</p>
-  <p>Czas realizacji może się wydłużyć przy projektach customowych.</p>
+  <h3>W przypadku opóźnienia w nadaniu przesyłki, na adres e-mail podany w zamówieniu zostanie wysłany kod rabatowy do wykorzystania przy kolejnym zamówieniu.<Br>
+    Czas realizacji może ulec wydłużeniu w przypadku projektów niestandardowych lub dużej liczby zamówień.<br>Podany czas realizacji dotyczy wyłącznie gotowych projektów.<bR>
+     Produkty customowe oraz realizowane na indywidualne zlecenie (bez gotowego projektu) mogą mieć czas realizacji do 14 dni roboczych.</h3>
   <button onclick="zamknij()">Zamknij</button>
 </div>
 
