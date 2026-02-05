@@ -1,130 +1,243 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-    <title>D&P Studio</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>D&P Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="Gemini_Generated_Image_dtpmoadtpmoadtpm.png">
-    <style>
-        div{
-            font-family: monospace;
-            margin-left: 10px;
-            margin-right: 10px;
-            border-radius: 10px;
-            font-size: 70px;
-            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
-        }
-        
-        a:link {
-  color: rgb(49, 0, 184);
-  background-color: transparent;
-  text-decoration: none;
-  text-decoration: none;
-}
 
-a:visited {
-  color: rgb(0, 174, 255);
-  background-color: transparent;
-  text-decoration: none;
-  text-decoration: none;
-}
-
-a:hover {
-  color: rgb(46, 224, 255);
-  background-color: transparent;
-  text-decoration: underline;
-  text-decoration: none;
-}
-
-a:active {
-  color: rgb(162, 0, 255);
-  background-color: transparent;
-  text-decoration: underline;
-  text-decoration: none;
-}
-.container {
-    position: relative; /* Kontener określa punkt odniesienia */
-    display: inline-block; /* Dopasowuje kontener do rozmiaru zdjęć */
-}
-
-.base-image {
-    display: block;
-
-}
-
-.overlay-image {
-    position: absolute; /* Umożliwia swobodne przesuwanie */
-    top: 32%; /* Odległość od góry kontenera */
-    left: 43%; /* Odległość od lewej strony kontenera */
-    z-index: 10; /* Zapewnia, że jest na wierzchu */
-    width: 400px;
-    height: 400px;
-}
- #popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgb(94, 0, 0);
-        padding: 20px;
-        display: none;
-        border-radius: 10px;
-        z-index: 10;
+  <style>
+    * {
+      box-sizing: border-box;
     }
-    .container {
-  display: flex; /* Włącza Flexbox */
-  gap: 10px;    /* Opcjonalnie: odstęp między divami */
-}
-.box {
-  width: 50%;   /* Opcjonalnie: szerokość */
-}
-    </style>
+
+    body {
+      margin: 0;
+      background: black;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      color: white;
+    }
+
+    a {
+      color: rgb(49, 0, 184);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: rgb(46, 224, 255);
+      text-decoration: underline;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgb(7, 0, 104);
+      padding: 15px 30px;
+      flex-wrap: wrap;
+    }
+
+    header img {
+      width: 120px;
+      height: auto;
+    }
+
+    nav a {
+      margin-left: 25px;
+      font-size: 5rem;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      width: 100%;
+      border: 1px solid rgb(7, 0, 104);
+    }
+
+    .hero img.base {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hero img.overlay {
+      position: absolute;
+      top: 55%;
+      left: 54%;
+      transform: translate(-50%, -50%);
+      width: 280px;
+      max-width: 80%;
+    }
+
+    /* ===== INFO BOXES ===== */
+    .info {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+
+    .info-box {
+      flex: 1 1 300px;
+      background: rgb(7, 0, 104);
+      border-radius: 30px;
+      padding: 25px;
+      text-align: center;
+      min-height: 350px;
+    }
+
+    .info-box h2 {
+      color: cornflowerblue;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .info-box p {
+      color: cadetblue;
+      font-size: 1.3rem;
+    }
+
+    .big-number {
+      font-size: 8rem;
+      color: cadetblue;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: rgb(24,24,24);
+      padding: 40px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .newsletter {
+      max-width: 400px;
+      color: cadetblue;
+    }
+
+    .newsletter input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .newsletter button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: cornflowerblue;
+    }
+
+    .contact img {
+      width: 120px;
+      margin-right: 0px;
+    }
+
+    /* ===== POPUP ===== */
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgb(94, 0, 0);
+      padding: 25px;
+      border-radius: 15px;
+      display: none;
+      z-index: 100;
+      max-width: 90%;
+    }
+
+    #popup button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      nav {
+        width: 100%;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .big-number {
+        font-size: 5rem;
+      }
+    }
+  </style>
 </head>
-<body style="background-color: rgb(0, 0, 0);">
-    <div style="background-color: rgb(7, 0, 104); margin-left: 0px; height:auto ; width: 100%; font-size:30px; float: left;" ><img src="Gemini_Generated_Image_transparent.png" style="width: 120px; height: 120px; margin-left: 20px; margin-top: 10px;">
-        <div style="float: right; margin-top: 15px; margin-right: 50px;"><a href="">Nasz Sklep</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index1.html">Twój Projekt</a></div></div>
-        <bR>
-        <br>
-      <div style="border: solid rgb(7, 0, 104) 1px;width: 99% ;" class="container" >
-    <img src="Gemini_Generated_Image_l22poul22poul22p.png" style="width: 100%; height: 1000px;" class="base-image">
-    <a href=""><img src="OFERTA.svg" class="overlay-image" ></a>
-      </div>
-      <br>
-      <div style="background-color: rgb(7, 0, 104); width: 32%; height: 700px; float: left; text-align: center; border-radius: 30px;">
-        <bR>
-        <div style="color: cornflowerblue;">DOSTAWA</div>
-        <div style="color: cadetblue; float: left;">Zamówienia realizujemy<br> do 5 dni roboczych.*</div> <div style="text-decoration: underline; font-size: medium; color: rgb(160, 95, 95);" onclick="pokaz()">*Informacje dotyczące wysyłki</div> 
+
+<body>
+
+<header>
+  <img src="Gemini_Generated_Image_transparent.png" alt="Logo">
+  <nav>
+    <a href="#">Nasz Sklep</a>
+    <a href="index1.html">Twój Projekt</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <img src="Gemini_Generated_Image_l22poul22poul22p.png" class="base" alt="">
+  <a href="#"><img src="OFERTA.svg" class="overlay" alt="Oferta"></a>
+</section>
+
+<section class="info">
+  <div class="info-box">
+    <h2>DOSTAWA</h2>
+    <p>Zamówienia realizujemy<br>do 5 dni roboczych*</p>
+    <p style="text-decoration: underline; cursor: pointer;" onclick="pokaz()">*Informacje dotyczące wysyłki</p>
+  </div>
+
+  <div class="info-box">
+    <h2>ZREALIZOWANE ZAMÓWIENIA</h2>
+    <div class="big-number">6</div>
+  </div>
+
+  <div class="info-box">
+    <h2>DARMOWA DOSTAWA</h2>
+    <p>Przy zamówieniu za min. 100 zł wysyłka gratis</p>
+  </div>
+</section>
+
+<footer>
+  <div class="newsletter">
+    <p>Podaj e-mail aby otrzymywać powiadomienia o ofertach</p>
+    <input type="email" placeholder="Twój e-mail">
+    <button>Zapisz się</button>
+  </div>
+
+  <div class="contact">
+    <div>
+      <a href="https://www.tiktok.com/@dpstudio2026">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Gemini_Generated_Image_nr35wgnr35wgnr35_tt.png">
+      </a>
     </div>
-      <div style="background-color: rgb(7, 0, 104); width: 32%; height: 700px; float: left; text-align: center; border-radius: 30px;">
-        <br>
-        <div style="color: cornflowerblue;">ZREALIZOWANE ZAMÓWIENIA:</div>
-        <div style="font-size: 200px; color: cadetblue;">6</div>
-      </div>
-            <div style="background-color: rgb(7, 0, 104); width: 32%; height: 700px; float: left; text-align: center; border-radius: 30px;">
-      <Br>
-        <div style="color: cornflowerblue;">Darmowa dostawa</div>
-        <div style="color: cadetblue;">Przy zamówieniu za min 100zł wysyłka gratis</div>
-      </div>
-      <div style="background-color: rgb(24,24,24);height: 700 px; width: 100%; clear: both;">
-        
-        <div style="float: left; height: 100%; width: 32%; text-align: center; color: cadetblue;">Podaj e-mail aby otrzymywać powiadominia o ofertach<br><div style="float: left; "></div>
-        <form>
-          <div><input type="text"></div>
-          <div><input type="submit"></div>
-        </form>
-        </div>
-      <div style="float: right;">
-        <div style="margin-top: 20px; color: cornflowerblue;">Kontakt:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.tiktok.com/@dpstudio2026"><img src="Gemini_Generated_Image_nr35wgnr35wgnr35_tt.png" style="width: 150px; height: 150px;"></a></div>
-      <div style="margin-top: 20px; color: cadetblue;"><a href="mailto:d.pstudio@wp.p">D.PStudio@wp.pl</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=""><img src="Gemini_Generated_Image_khbzu5khbzu5khbz_ig.png" style="width: 150px; height: 150px;"></a></div>
-            <div style="margin-top: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<!--<a href=""><img src="Gemini_Generated_Image_dzmx8edzmx8edzmx_yt.png" style="width: 150px; height: 150px;"></a>--></div>
-      </div>
-      <div id="popup" style="text-align: center;">
-    <div>Informacje dotyczące wysyłki</div>
-    <div>W przypadku opóźnienia w nadaniu przesyłki, na adres e-mail podany w zamówieniu zostanie wysłany kod rabatowy do wykorzystania przy kolejnym zamówieniu.</div>
-    <div style="font-size:large;">Czas realizacji może ulec wydłużeniu w przypadku projektów niestandardowych lub dużej liczby zamówień.</div>
-    <div style="font-size:large;">Podany czas realizacji dotyczy wyłącznie gotowych projektów.
-Produkty customowe oraz realizowane na indywidualne zlecenie (bez gotowego projektu) mogą mieć czas realizacji do 14 dni roboczych.</div>
-    <button onclick="zamknij()">Zamknij</button>
+    <div>
+      <a href="mailto:d.pstudio@wp.pl">D.PStudio@wp.pl</a>
+      <a href="#"><img src="Gemini_Generated_Image_khbzu5khbzu5khbz_ig.png"></a>
     </div>
-      <script src="script.js"></script>
-    </body>
+  </div>
+</footer>
+
+<div id="popup">
+  <h3>Informacje dotyczące wysyłki</h3>
+  <p>W przypadku opóźnień wysyłki wysyłamy kod rabatowy.</p>
+  <p>Czas realizacji może się wydłużyć przy projektach customowych.</p>
+  <button onclick="zamknij()">Zamknij</button>
+</div>
+
+<script src="script.js"></script>
+
+</body>
 </html>
