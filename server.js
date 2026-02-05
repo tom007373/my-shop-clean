@@ -2,16 +2,13 @@ require("dotenv").config();
 const express = require("express");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
-app.get("/", (req, res) => {
-  res.send("OK 🚀 App działa");
-});
+if (!PORT) {
+  console.error("❌ Brak PORT z Railway");
+}
 
-app.get("/ping", (req, res) => {
-  res.send("Server działa! 🚀");
-});
-
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server działa! 🚀 na porcie ${PORT}`);
 });
+
