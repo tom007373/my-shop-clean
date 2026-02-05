@@ -1,0 +1,68 @@
+1. Administrator danych osobowych
+
+Administratorem Twoich danych osobowych jest Design And Printing Studio.
+
+Kontakt w sprawach dotyczących danych osobowych:
+E-mail: d.pstudio@wp.pl
+
+2. Zakres i cel zbierania danych
+
+Podczas składania zamówienia jako gość przekazujesz nam następujące dane:
+
+Imię i nazwisko
+
+Adres e-mail
+
+Adres wysyłki, w tym kod pocztowy
+
+Inne dane niezbędne do realizacji zamówienia
+
+Dane te są przetwarzane wyłącznie w celu:
+
+Realizacji zamówień i wysyłki produktów
+
+Obsługi płatności za pośrednictwem Stripe
+
+Wysyłki kodów rabatowych w przypadku opóźnienia nadania przesyłki
+
+3. Podstawa prawna przetwarzania danych
+
+Przetwarzanie danych osobowych odbywa się na podstawie:
+
+Art. 6 ust. 1 lit. b RODO – w celu realizacji umowy (zamówienia)
+
+Art. 6 ust. 1 lit. a RODO – w przypadku przesyłania materiałów marketingowych na podstawie dobrowolnej zgody klienta
+
+4. Przechowywanie danych
+
+Dane osobowe przechowujemy wyłącznie do momentu przekazania przesyłki firmie kurierskiej, po czym są usuwane.
+
+5. Odbiorcy danych
+
+Dane nie są udostępniane podmiotom trzecim, z wyjątkiem firm kurierskich niezbędnych do realizacji wysyłki.
+
+6. Cookies i narzędzia śledzące
+
+Nie używamy plików cookies ani innych narzędzi śledzących do analizy ruchu w sklepie.
+
+7. Płatności
+
+Płatności obsługiwane są przez Stripe. Podczas płatności przetwarzanie danych odbywa się zgodnie z regulaminem Stripe. Sklep nie przechowuje danych kart płatniczych klientów.
+
+8. Realizacja zamówień
+
+Standardowy czas realizacji gotowych projektów: 5 dni roboczych
+
+Projekty customowe lub realizowane na indywidualne zamówienie mogą mieć czas realizacji do 14 dni roboczych
+
+W przypadku opóźnienia nadania przesyłki klient otrzyma kod rabatowy na kolejny zakup na podany adres e-mail
+
+Brak możliwości zwrotu produktów customowych
+
+9. Zgody marketingowe
+
+Wysyłamy powiadomienia o promocjach lub nowościach wyłącznie do klientów, którzy wyraźnie wyrazili na to zgodę, podając adres e-mail w odpowiedniej rubryce na dole strony głównej.
+
+10. Zmiany w polityce prywatności
+
+Administrator zastrzega sobie prawo do wprowadzania zmian w polityce prywatności. Każda zmiana będzie publikowana na stronie sklepu.
