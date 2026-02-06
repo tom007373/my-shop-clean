@@ -6,22 +6,25 @@ const Stripe = require("stripe");
 
 const app = express();
 
-// ⛔ NIE dawaj fallbacku 3000
 const PORT = process.env.PORT;
-
 if (!PORT) {
-  console.error("❌ PORT nie został ustawiony przez Railway");
+  console.error("❌ PORT nie został ustawiony");
   process.exit(1);
 }
 
-// Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ Brak STRIPE_SECRET_KEY");
   process.exit(1);
 }
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-app.post("/newsletter", express.json(), (req, res) => {
+
+// middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+// newsletter
+app.post("/newsletter", (req, res) => {
   const { email } = req.body;
 
   if (!email || !email.includes("@")) {
@@ -41,17 +44,12 @@ app.post("/newsletter", express.json(), (req, res) => {
   });
 });
 
-// Middleware
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-// Test
+// test
 app.get("/ping", (req, res) => {
   res.send("Server działa! 🚀");
 });
 
-// Start serwera — TO JEST KLUCZ
+// start
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server działa na porcie ${PORT}`);
 });
-
