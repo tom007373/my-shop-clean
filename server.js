@@ -54,14 +54,4 @@ app.get("/ping", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server działa na porcie ${PORT}`);
 });
-app.post("/newsletter", express.json(), (req, res) => {
-  const { email } = req.body;
 
-  if (!email || !email.includes("@")) {
-    return res.status(400).json({ error: "Nieprawidłowy email" });
-  }
-
-  console.log("Nowy zapis do newslettera:", email);
-
-  res.json({ success: true });
-});
