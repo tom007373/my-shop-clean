@@ -105,3 +105,28 @@ searchInput.addEventListener("input", e => {
 
 renderProducts(products);
 renderCart();
+
+async function checkout() {
+  if (cart.length === 0) {
+    alert("Koszyk jest pusty");
+    return;
+  }
+
+  try {
+    const res = await fetch("/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cart })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Błąd płatności");
+    }
+  } catch (err) {
+    alert("Błąd połączenia z serwerem");
+  }
+}
