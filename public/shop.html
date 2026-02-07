@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>D&PShop</title>
+  <style>
+.shop-header {
+  width: 100%;
+  background: #0300a7;
+  text-align: center;
+  padding: 30px;
+  font-size: 3rem;
+}
+
+.search {
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+  display: block;
+  padding: 10px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: none;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.product {
+  background: #004ea7;
+  border-radius: 15px;
+  padding: 15px;
+  text-align: center;
+}
+
+.product img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+
+.product button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.cart {
+  background: #ff0000;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty button {
+  padding: 4px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background: cornflowerblue;
+}
+
+  </style>
+</head>
+<body>
+<body>
+
+  <div class="shop-header">Nasz sklep</div>
+
+  <!-- Wyszukiwarka -->
+  <input
+    type="text"
+    id="search"
+    class="search"
+    placeholder="Szukaj produktu..."
+  >
+
+  <!-- Produkty -->
+  <div id="products" class="products-grid"></div>
+<!-- Koszyk -->
+<div class="cart">
+  <h2>Koszyk</h2>
+  <div id="cart-items"></div>
+  <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
+  <button onclick="clearCart()">Wyczyść koszyk</button>
+</div>
+
+  <script src="shop.js"></script>
+</body>
+</body>
+</html>
