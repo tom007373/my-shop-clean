@@ -1,7 +1,19 @@
-Starting Container
-npm warn config production Use `--omit=dev` instead.
-> my-shop@1.0.0 start
-> node server.js
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
-✅ Server działa na porcie 8080
-Stopping Container
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+
+const app = express();
+
+/* Railway / lokalnie */
+const PORT = process.env.PORT || 8080;
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/ping", (req, res) => {
+  res.send("Server działa! 🚀");
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("✅ Server działa na porcie", PORT);
+});
