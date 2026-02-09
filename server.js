@@ -8,6 +8,11 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
 
 const PORT = process.env.PORT;
+ 
+if (!PORT) {
+  console.error("❌ BRAK process.env.PORT — Railway go nie wstrzyknął");
+  process.exit(1);
+}
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
