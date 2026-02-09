@@ -22,6 +22,15 @@ app.get("/ping", (req, res) => {
   res.send("OK");
 });
 
+/* ===== NEWSLETTER ===== */
+app.post("/newsletter", (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ error: "Nieprawidłowy email" });
+  }
+  fs.appendFileSync("newsletter.txt", email + "\n");
+  res.json({ success: true });
+});
 
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
