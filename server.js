@@ -25,11 +25,18 @@ app.get("/ping", (req, res) => {
 /* ===== NEWSLETTER ===== */
 app.post("/newsletter", (req, res) => {
   const { email } = req.body;
+
   if (!email || !email.includes("@")) {
     return res.status(400).json({ error: "Nieprawidłowy email" });
   }
-  fs.appendFileSync("newsletter.txt", email + "\n");
-  res.json({ success: true });
+
+  try {
+    fs.appendFileSync("/tmp/newsletter.txt", email + "\n");
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Newsletter write error:", err);
+    res.status(500).json({ error: "Błąd zapisu" });
+  }
 });
 
 /* ===== CHECKOUT ===== */
