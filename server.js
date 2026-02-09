@@ -7,7 +7,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
