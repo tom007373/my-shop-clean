@@ -62,7 +62,13 @@ app.post("/checkout", async (req, res) => {
     res.status(500).json({ error: "Stripe error" });
   }
 });
+app.get("/", (req, res) => {
+  res.status(200).send("OK");
+});
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 /* ===== START ===== */
 const server = app.listen(PORT, () => {
   console.log("✅ Server listening on port", PORT);
