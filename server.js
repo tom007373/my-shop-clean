@@ -97,4 +97,6 @@ app.post("/checkout", async (req, res) => {
 
 /* ===== START ===== */
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server działa na porcie ${PO
+  console.log("✅ Server działa na porcie", PORT);
+});
+
