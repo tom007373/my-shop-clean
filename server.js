@@ -22,16 +22,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
-CREATE TABLE orders (
-  id SERIAL PRIMARY KEY,
-  email TEXT,
-  name TEXT,
-  phone TEXT,
-  address JSONB,
-  cart JSONB,
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW()
-);
 
 /* ================== STRIPE ================== */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -45,10 +35,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* ================== DB INIT ================== */
 /*
-  Co robi ten kod?
-  - Przy starcie serwera upewnia się, że tabela istnieje
-  - Nie tworzy jej drugi raz
-  - Nie powoduje crashy przy redeploy
+  Co robi ten blok?
+  - Tworzy tabele JEŚLI NIE ISTNIEJĄ
+  - Jest bezpieczny przy redeploy
+  - NIE wywala serwera
 */
 (async () => {
   try {
@@ -59,7 +49,21 @@ app.use(express.static(path.join(__dirname, "public")));
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
-    console.log("✅ Newsletter table ready");
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        name TEXT NOT NULL,
+        phone TEXT,
+        address JSONB NOT NULL,
+        cart JSONB NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    console.log("✅ Database ready");
   } catch (err) {
     console.error("❌ DB init error:", err.message);
     process.exit(1);
@@ -68,7 +72,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* ================== ROUTES ================== */
 
-/* TEST */
 app.get("/ping", (req, res) => {
   res.send("OK");
 });
@@ -77,7 +80,6 @@ app.get("/ping", (req, res) => {
 app.post("/newsletter", async (req, res) => {
   const { email } = req.body;
 
-  // Walidacja danych
   if (!email || !email.includes("@")) {
     return res.status(400).json({ error: "Nieprawidłowy email" });
   }
@@ -90,7 +92,7 @@ app.post("/newsletter", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error("❌ Newsletter DB error:", err.message);
+    console.error("❌ Newsletter error:", err.message);
     res.status(500).json({ error: "Błąd zapisu" });
   }
 });
@@ -105,9 +107,11 @@ app.post("/checkout", async (req, res) => {
     }
 
     const order = await pool.query(
-      `INSERT INTO orders (email, name, phone, address, cart)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id`,
+      `
+      INSERT INTO orders (email, name, phone, address, cart)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+      `,
       [
         customer.email,
         customer.name,
@@ -133,9 +137,7 @@ app.post("/checkout", async (req, res) => {
       line_items,
       success_url: `${process.env.DOMAIN}/success.html`,
       cancel_url: `${process.env.DOMAIN}/cancel.html`,
-      metadata: {
-        order_id: orderId
-      }
+      metadata: { order_id: orderId }
     });
 
     res.json({ url: session.url });
@@ -151,19 +153,12 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-/* ================== START ================== */
+/* START */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Server listening on port", PORT);
 });
 
-/* ================== SHUTDOWN ================== */
-/*
-  Railway wysyła SIGTERM przy:
-  - redeploy
-  - zmianie variables
-  - skali
-  To NIE jest błąd
-*/
+/* SIGTERM (NORMALNE NA RAILWAY) */
 process.on("SIGTERM", () => {
   console.log("⚠️ SIGTERM from Railway (normal shutdown)");
 });
