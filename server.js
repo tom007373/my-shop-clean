@@ -28,7 +28,14 @@ app.post("/newsletter", (req, res) => {
   if (!email || !email.includes("@")) {
     return res.status(400).json({ error: "Nieprawidłowy email" });
   }
-  fs.appendFileSync("newsletter.txt", email + "\n");
+  const filePath = path.join(__dirname, "newsletter.txt");
+
+try {
+  fs.appendFileSync(filePath, email + "\n", { encoding: "utf8" });
+} catch (err) {
+  console.error("❌ Błąd zapisu newslettera:", err.message);
+  return res.status(500).json({ error: "Błąd zapisu" });
+}
   res.json({ success: true });
 });
 
