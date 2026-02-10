@@ -1,4 +1,3 @@
-const fs = require("fs");
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
@@ -28,14 +27,26 @@ app.post("/newsletter", (req, res) => {
   if (!email || !email.includes("@")) {
     return res.status(400).json({ error: "Nieprawidłowy email" });
   }
-  const filePath = path.join(__dirname, "newsletter.txt");
+  app.post("/newsletter", async (req, res) => {
+  const { email } = req.body;
 
-try {
-  fs.appendFileSync(filePath, email + "\n", { encoding: "utf8" });
-} catch (err) {
-  console.error("❌ Błąd zapisu newslettera:", err.message);
-  return res.status(500).json({ error: "Błąd zapisu" });
-}
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ error: "Nieprawidłowy email" });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO newsletter (email) VALUES ($1) ON CONFLICT (email) DO NOTHING",
+      [email]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Newsletter DB error:", err.message);
+    res.status(500).json({ error: "Błąd zapisu" });
+  }
+});
+
   res.json({ success: true });
 });
 
