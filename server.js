@@ -35,10 +35,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* ================== DB INIT ================== */
 /*
-  Ten blok:
-  - tworzy tabele JEŚLI NIE ISTNIEJĄ
-  - jest bezpieczny przy redeploy
-  - nie powoduje crasha
+  Co robi ten blok?
+  - Tworzy tabele JEŚLI NIE ISTNIEJĄ
+  - Jest bezpieczny przy redeploy
+  - NIE wywala serwera
 */
 (async () => {
   try {
@@ -47,20 +47,20 @@ app.use(express.static(path.join(__dirname, "public")));
         id SERIAL PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         created_at TIMESTAMP DEFAULT NOW()
-      );
+      )
     `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
-        email TEXT,
-        name TEXT,
+        email TEXT NOT NULL,
+        name TEXT NOT NULL,
         phone TEXT,
-        address JSONB,
-        cart JSONB,
+        address JSONB NOT NULL,
+        cart JSONB NOT NULL,
         status TEXT DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT NOW()
-      );
+      )
     `);
 
     console.log("✅ Database ready");
@@ -76,7 +76,7 @@ app.get("/ping", (req, res) => {
   res.send("OK");
 });
 
-/* ===== NEWSLETTER ===== */
+/* NEWSLETTER */
 app.post("/newsletter", async (req, res) => {
   const { email } = req.body;
 
@@ -89,6 +89,7 @@ app.post("/newsletter", async (req, res) => {
       "INSERT INTO newsletter (email) VALUES ($1) ON CONFLICT (email) DO NOTHING",
       [email]
     );
+
     res.json({ success: true });
   } catch (err) {
     console.error("❌ Newsletter error:", err.message);
@@ -96,7 +97,7 @@ app.post("/newsletter", async (req, res) => {
   }
 });
 
-/* ===== CHECKOUT ===== */
+/* CHECKOUT */
 app.post("/checkout", async (req, res) => {
   try {
     const { customer, cart } = req.body;
@@ -106,9 +107,11 @@ app.post("/checkout", async (req, res) => {
     }
 
     const order = await pool.query(
-      `INSERT INTO orders (email, name, phone, address, cart)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id`,
+      `
+      INSERT INTO orders (email, name, phone, address, cart)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+      `,
       [
         customer.email,
         customer.name,
@@ -138,22 +141,24 @@ app.post("/checkout", async (req, res) => {
     });
 
     res.json({ url: session.url });
+
   } catch (err) {
     console.error("❌ Checkout error:", err);
     res.status(500).json({ error: "Błąd płatności" });
   }
 });
 
+/* HEALTH */
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-/* ================== START ================== */
+/* START */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Server listening on port", PORT);
 });
 
-/* ================== SHUTDOWN ================== */
+/* SIGTERM (NORMALNE NA RAILWAY) */
 process.on("SIGTERM", () => {
   console.log("⚠️ SIGTERM from Railway (normal shutdown)");
 });
