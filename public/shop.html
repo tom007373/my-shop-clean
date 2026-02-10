@@ -1,91 +1,111 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>D&PShop</title>
+  <meta charset="UTF-8">
+  <title>D&P Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-.shop-header {
-  width: 100%;
-  background: #0300a7;
-  text-align: center;
-  padding: 30px;
-  font-size: 3rem;
-}
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
+      color: #fff;
+    }
 
-.search {
-  width: 90%;
-  max-width: 400px;
-  margin: 20px auto;
-  display: block;
-  padding: 10px;
-  font-size: 1.1rem;
-  border-radius: 10px;
-  border: none;
-}
+    .shop-header {
+      width: 100%;
+      background: #0300a7;
+      text-align: center;
+      padding: 20px;
+      font-size: 2.2rem;
+    }
 
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
+    .search {
+      width: 90%;
+      max-width: 400px;
+      margin: 20px auto;
+      display: block;
+      padding: 10px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+    }
 
-.product {
-  background: #004ea7;
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-}
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
 
-.product img {
-  width: 100%;
-  height: 180px;
-  object-fit: contain;
-}
+    .product {
+      background: #004ea7;
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+    }
 
-.product button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-.cart {
-  background: #ff0000;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 15px;
-}
+    .product img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+    }
 
-.cart-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.qty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+    .product button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
 
-.qty button {
-  padding: 4px 10px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background: cornflowerblue;
-}
+    .cart {
+      background: #1a1a1a;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 15px;
+    }
 
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .qty {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty button {
+      padding: 4px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: cornflowerblue;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: cornflowerblue;
+    }
   </style>
 </head>
-<body>
+
 <body>
 
   <div class="shop-header">Nasz sklep</div>
 
-  <!-- Wyszukiwarka -->
   <input
     type="text"
     id="search"
@@ -93,18 +113,33 @@
     placeholder="Szukaj produktu..."
   >
 
-  <!-- Produkty -->
   <div id="products" class="products-grid"></div>
-<!-- Koszyk -->
-<div class="cart">
-  <h2>Koszyk</h2>
-  <div id="cart-items"></div>
-  <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
-  <button onclick="clearCart()">Wyczyść koszyk</button>
-<button onclick="checkout()">Przejdź do płatności</button>
-</div>
+
+  <div class="cart">
+    <h2>Koszyk</h2>
+    <div id="cart-items"></div>
+    <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
+
+    <button onclick="clearCart()">Wyczyść koszyk</button>
+
+    <button class="checkout-btn" onclick="goToCheckout()">
+      Przejdź dalej
+    </button>
+  </div>
 
   <script src="shop.js"></script>
-</body>
+
+  <script>
+    function goToCheckout() {
+      if (!window.cart || cart.length === 0) {
+        alert("Koszyk jest pusty");
+        return;
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.location.href = "/dane-platnosc.html";
+    }
+  </script>
+
 </body>
 </html>

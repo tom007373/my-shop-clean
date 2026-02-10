@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>D&P Studio – Dane i płatność</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: cornflowerblue;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    form {
+      background: rgb(7, 0, 104);
+      padding: 25px;
+      border-radius: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      color: cadetblue;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .checkbox {
+      margin-top: 20px;
+      font-size: 0.85rem;
+    }
+
+    .checkbox input {
+      margin-right: 8px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 14px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: cornflowerblue;
+      color: #000;
+    }
+
+    button:hover {
+      background: rgb(46, 224, 255);
+    }
+
+    a {
+      color: cornflowerblue;
+    }
+  </style>
+</head>
+
+<body>
+
+<main>
+
+  <h1>Dane do zamówienia</h1>
+
+  <form id="checkout-form">
+
+    <h2>Dane klienta</h2>
+
+    <label>
+      Imię i nazwisko
+      <input type="text" name="full_name" required autocomplete="name">
+    </label>
+
+    <label>
+      E-mail
+      <input type="email" name="email" required autocomplete="email">
+    </label>
+
+    <label>
+      Numer telefonu
+      <input type="tel" name="phone" required autocomplete="tel">
+    </label>
+
+    <h2>Adres wysyłki</h2>
+
+    <label>
+      Ulica i numer
+      <input type="text" name="street" required autocomplete="address-line1">
+    </label>
+
+    <label>
+      Kod pocztowy
+      <input type="text" name="postal_code" required autocomplete="postal-code">
+    </label>
+
+    <label>
+      Miasto
+      <input type="text" name="city" required autocomplete="address-level2">
+    </label>
+
+    <label>
+      Kraj
+      <input type="text" name="country" value="Polska" required>
+    </label>
+
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" name="terms" required>
+        Akceptuję <a href="/privacy.html">politykę prywatności</a> oraz
+        <a href="/terms.html">regulamin</a>
+      </label>
+    </div>
+
+    <button type="submit">
+      Przejdź do płatności
+    </button>
+
+  </form>
+
+</main>
+<script>
+  const cart = JSON.parse(localStorage.getItem("cart"));
+
+  if (!cart || cart.length === 0) {
+    alert("Koszyk jest pusty");
+    window.location.href = "/shop.html";
+  }
+
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+      customer: {
+        name: document.querySelector("#name").value,
+        email: document.querySelector("#email").value,
+        phone: document.querySelector("#phone").value,
+        address: {
+          street: document.querySelector("#street").value,
+          zip: document.querySelector("#zip").value,
+          city: document.querySelector("#city").value,
+          country: "PL"
+        }
+      },
+      cart
+    };
+
+    try {
+      const res = await fetch("/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+
+      if (result.url) {
+        window.location.href = result.url;
+      } else {
+        alert("Błąd płatności");
+      }
+    } catch (err) {
+      alert("Błąd serwera");
+    }
+  });
+</script>
+
+</body>
+</html>

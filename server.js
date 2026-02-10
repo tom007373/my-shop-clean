@@ -22,6 +22,16 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  email TEXT,
+  name TEXT,
+  phone TEXT,
+  address JSONB,
+  cart JSONB,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
 /* ================== STRIPE ================== */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -88,11 +98,26 @@ app.post("/newsletter", async (req, res) => {
 /* CHECKOUT */
 app.post("/checkout", async (req, res) => {
   try {
-    const { cart } = req.body;
+    const { customer, cart } = req.body;
 
-    if (!cart || cart.length === 0) {
-      return res.status(400).json({ error: "Pusty koszyk" });
+    if (!customer || !cart || cart.length === 0) {
+      return res.status(400).json({ error: "Nieprawidłowe dane" });
     }
+
+    const order = await pool.query(
+      `INSERT INTO orders (email, name, phone, address, cart)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [
+        customer.email,
+        customer.name,
+        customer.phone,
+        customer.address,
+        cart
+      ]
+    );
+
+    const orderId = order.rows[0].id;
 
     const line_items = cart.map(item => ({
       price_data: {
@@ -107,13 +132,17 @@ app.post("/checkout", async (req, res) => {
       mode: "payment",
       line_items,
       success_url: `${process.env.DOMAIN}/success.html`,
-      cancel_url: `${process.env.DOMAIN}/cancel.html`
+      cancel_url: `${process.env.DOMAIN}/cancel.html`,
+      metadata: {
+        order_id: orderId
+      }
     });
 
     res.json({ url: session.url });
+
   } catch (err) {
-    console.error("❌ Stripe error:", err.message);
-    res.status(500).json({ error: "Stripe error" });
+    console.error("❌ Checkout error:", err);
+    res.status(500).json({ error: "Błąd płatności" });
   }
 });
 
