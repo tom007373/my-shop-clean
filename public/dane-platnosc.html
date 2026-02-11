@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,9 +21,7 @@
       padding: 20px;
     }
 
-    h1, h2 {
-      color: cornflowerblue;
-    }
+    h1, h2 { color: cornflowerblue; }
 
     h1 {
       text-align: center;
@@ -45,9 +41,7 @@
       color: cadetblue;
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"] {
+    input {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -62,6 +56,7 @@
     }
 
     .checkbox input {
+      width: auto;
       margin-right: 8px;
     }
 
@@ -81,9 +76,7 @@
       background: rgb(46, 224, 255);
     }
 
-    a {
-      color: cornflowerblue;
-    }
+    a { color: cornflowerblue; }
   </style>
 </head>
 
@@ -99,44 +92,44 @@
 
     <label>
       Imię i nazwisko
-      <input type="text" name="full_name" required autocomplete="name">
+      <input type="text" id="full_name" required>
     </label>
 
     <label>
       E-mail
-      <input type="email" name="email" required autocomplete="email">
+      <input type="email" id="email" required>
     </label>
 
     <label>
       Numer telefonu
-      <input type="tel" name="phone" required autocomplete="tel">
+      <input type="tel" id="phone" required>
     </label>
 
     <h2>Adres wysyłki</h2>
 
     <label>
       Ulica i numer
-      <input type="text" name="street" required autocomplete="address-line1">
+      <input type="text" id="street" required>
     </label>
 
     <label>
       Kod pocztowy
-      <input type="text" name="postal_code" required autocomplete="postal-code">
+      <input type="text" id="postal_code" required>
     </label>
 
     <label>
       Miasto
-      <input type="text" name="city" required autocomplete="address-level2">
+      <input type="text" id="city" required>
     </label>
 
     <label>
       Kraj
-      <input type="text" name="country" value="Polska" required>
+      <input type="text" id="country" value="Polska" required>
     </label>
 
     <div class="checkbox">
       <label>
-        <input type="checkbox" name="terms" required>
+        <input type="checkbox" id="terms" required>
         Akceptuję <a href="/privacy.html">politykę prywatności</a> oraz
         <a href="/terms.html">regulamin</a>
       </label>
@@ -149,6 +142,7 @@
   </form>
 
 </main>
+
 <script>
   const cart = JSON.parse(localStorage.getItem("cart"));
 
@@ -157,19 +151,19 @@
     window.location.href = "/shop.html";
   }
 
-  document.querySelector("form").addEventListener("submit", async (e) => {
+  document.getElementById("checkout-form").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const data = {
       customer: {
-        name: document.querySelector("#name").value,
-        email: document.querySelector("#email").value,
-        phone: document.querySelector("#phone").value,
+        name: document.getElementById("full_name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
         address: {
-          street: document.querySelector("#street").value,
-          zip: document.querySelector("#zip").value,
-          city: document.querySelector("#city").value,
-          country: "PL"
+          street: document.getElementById("street").value,
+          zip: document.getElementById("postal_code").value,
+          city: document.getElementById("city").value,
+          country: document.getElementById("country").value
         }
       },
       cart
@@ -185,10 +179,12 @@
       const result = await res.json();
 
       if (result.url) {
+        localStorage.removeItem("cart"); // czyścimy koszyk po przekierowaniu
         window.location.href = result.url;
       } else {
         alert("Błąd płatności");
       }
+
     } catch (err) {
       alert("Błąd serwera");
     }

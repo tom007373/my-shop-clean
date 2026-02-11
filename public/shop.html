@@ -129,17 +129,5 @@
 
   <script src="shop.js"></script>
 
-  <script>
-    function goToCheckout() {
-      if (!window.cart || cart.length === 0) {
-        alert("Koszyk jest pusty");
-        return;
-      }
-
-      localStorage.setItem("cart", JSON.stringify(cart));
-      window.location.href = "/dane-platnosc.html";
-    }
-  </script>
-
 </body>
 </html>
