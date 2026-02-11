@@ -33,40 +33,45 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* ================== BEZPIECZNY DB INIT ================== */
 
-async function initDatabase() {
-  try {
-    await pool.query(`SELECT 1`);
-    console.log("✅ DB connected");
+async function initDB(retries = 10) {
+  while (retries) {
+    try {
+      await pool.query("SELECT 1");
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS newsletter (
-        id SERIAL PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS newsletter (
+          id SERIAL PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS orders (
-        id SERIAL PRIMARY KEY,
-        email TEXT,
-        name TEXT,
-        phone TEXT,
-        address JSONB,
-        cart JSONB,
-        status TEXT DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS orders (
+          id SERIAL PRIMARY KEY,
+          email TEXT,
+          name TEXT,
+          phone TEXT,
+          address JSONB,
+          cart JSONB,
+          status TEXT DEFAULT 'pending',
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
 
-    console.log("✅ Database ready");
-  } catch (err) {
-    console.error("❌ DB connection error (will retry):", err.message);
-    setTimeout(initDatabase, 5000); // próba ponownie za 5 sek
+      console.log("✅ Database ready");
+      return;
+    } catch (err) {
+      console.log("⏳ Waiting for DB...");
+      retries--;
+      await new Promise(res => setTimeout(res, 3000));
+    }
   }
+
+  console.error("❌ Could not connect to DB after retries");
 }
 
-initDatabase();
+initDB();
 
 /* ================== ROUTES ================== */
 
