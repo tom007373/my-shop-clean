@@ -9,18 +9,16 @@ const { Pool } = require("pg");
 /* ================== WALIDACJA ENV ================== */
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ BRAK STRIPE_SECRET_KEY");
-  process.exit(1);
 }
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ BRAK DATABASE_URL");
-  process.exit(1);
 }
 
 /* ================== DB ================== */
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: false
 });
 
 /* ================== STRIPE ================== */
@@ -33,15 +31,13 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ================== DB INIT ================== */
-/*
-  Ten blok:
-  - tworzy tabele JEŚLI NIE ISTNIEJĄ
-  - jest bezpieczny przy redeploy
-  - nie powoduje crasha
-*/
-(async () => {
+/* ================== BEZPIECZNY DB INIT ================== */
+
+async function initDatabase() {
   try {
+    await pool.query(`SELECT 1`);
+    console.log("✅ DB connected");
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS newsletter (
         id SERIAL PRIMARY KEY,
@@ -65,15 +61,21 @@ app.use(express.static(path.join(__dirname, "public")));
 
     console.log("✅ Database ready");
   } catch (err) {
-    console.error("❌ DB init error:", err.message);
-    process.exit(1);
+    console.error("❌ DB connection error (will retry):", err.message);
+    setTimeout(initDatabase, 5000); // próba ponownie za 5 sek
   }
-})();
+}
+
+initDatabase();
 
 /* ================== ROUTES ================== */
 
 app.get("/ping", (req, res) => {
   res.send("OK");
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 /* ===== NEWSLETTER ===== */
@@ -138,22 +140,21 @@ app.post("/checkout", async (req, res) => {
     });
 
     res.json({ url: session.url });
+
   } catch (err) {
-    console.error("❌ Checkout error:", err);
+    console.error("❌ Checkout error:", err.message);
     res.status(500).json({ error: "Błąd płatności" });
   }
 });
 
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
 /* ================== START ================== */
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Server listening on port", PORT);
 });
 
 /* ================== SHUTDOWN ================== */
+
 process.on("SIGTERM", () => {
   console.log("⚠️ SIGTERM from Railway (normal shutdown)");
-});
+}); 
