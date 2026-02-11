@@ -107,36 +107,43 @@ app.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Nieprawidłowe dane" });
     }
 
-    await pool.query(
-  `INSERT INTO orders (email, name, phone, address, cart)
-   VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
-   RETURNING id`,
-  [
-    customer.email,
-    customer.name,
-    customer.phone,
-    JSON.stringify(customer.address),
-    JSON.stringify(cart)
-  ]
-);
+    // ✅ zapis do bazy
+    const orderResult = await pool.query(
+      `INSERT INTO orders (email, name, phone, address, cart)
+       VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+       RETURNING id`,
+      [
+        customer.email,
+        customer.name,
+        customer.phone,
+        JSON.stringify(customer.address),
+        JSON.stringify(cart)
+      ]
+    );
 
-    const orderId = order.rows[0].id;
+    const orderId = orderResult.rows[0].id;
 
+    // ✅ budujemy line items do Stripe
     const line_items = cart.map(item => ({
       price_data: {
         currency: "pln",
-        product_data: { name: item.name },
+        product_data: {
+          name: item.name
+        },
         unit_amount: Math.round(item.price * 100)
       },
       quantity: item.quantity
     }));
 
+    // ✅ tworzymy sesję Stripe
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
       success_url: `${process.env.DOMAIN}/success.html`,
       cancel_url: `${process.env.DOMAIN}/cancel.html`,
-      metadata: { order_id: orderId }
+      metadata: {
+        order_id: orderId
+      }
     });
 
     res.json({ url: session.url });
@@ -146,7 +153,6 @@ app.post("/checkout", async (req, res) => {
     res.status(500).json({ error: "Błąd płatności" });
   }
 });
-
 /* ================== START ================== */
 
 app.listen(PORT, "0.0.0.0", () => {
