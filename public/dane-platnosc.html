@@ -83,7 +83,6 @@
 <body>
 
 <main>
-
   <h1>Dane do zamówienia</h1>
 
   <form id="checkout-form">
@@ -130,8 +129,9 @@
     <div class="checkbox">
       <label>
         <input type="checkbox" id="terms" required>
-        Akceptuję <a href="/privacy.html">politykę prywatności</a> oraz
-        <a href="/terms.html">regulamin</a>
+        Akceptuję 
+        <a href="/privacy.html">politykę prywatności</a> 
+        oraz <a href="/terms.html">regulamin</a>
       </label>
     </div>
 
@@ -140,55 +140,65 @@
     </button>
 
   </form>
-
 </main>
 
 <script>
-  const cart = JSON.parse(localStorage.getItem("cart"));
 
-  if (!cart || cart.length === 0) {
-    alert("Koszyk jest pusty");
-    window.location.href = "/shop.html";
-  }
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  document.getElementById("checkout-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
+if (cart.length === 0) {
+  alert("Koszyk jest pusty");
+  window.location.href = "/shop.html";
+}
 
-    const data = {
-      customer: {
-        name: document.getElementById("full_name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        address: {
-          street: document.getElementById("street").value,
-          zip: document.getElementById("postal_code").value,
-          city: document.getElementById("city").value,
-          country: document.getElementById("country").value
-        }
-      },
-      cart
-    };
+document.getElementById("checkout-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch("/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const result = await res.json();
-
-      if (result.url) {
-        localStorage.removeItem("cart"); // czyścimy koszyk po przekierowaniu
-        window.location.href = result.url;
-      } else {
-        alert("Błąd płatności");
-      }
-
-    } catch (err) {
-      alert("Błąd serwera");
+  const customer = {
+    name: document.getElementById("full_name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    address: {
+      street: document.getElementById("street").value.trim(),
+      zip: document.getElementById("postal_code").value.trim(),
+      city: document.getElementById("city").value.trim(),
+      country: document.getElementById("country").value.trim()
     }
-  });
+  };
+
+  try {
+
+    const response = await fetch("/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        customer,
+        cart   // ← wysyłamy czysty obiekt, NIE string
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.error || "Błąd płatności");
+      return;
+    }
+
+    if (result.url) {
+      localStorage.removeItem("cart");
+      window.location.href = result.url;
+    } else {
+      alert("Nie udało się utworzyć sesji płatności");
+    }
+
+  } catch (err) {
+    console.error("Checkout error:", err);
+    alert("Błąd serwera");
+  }
+});
+
 </script>
 
 </body>

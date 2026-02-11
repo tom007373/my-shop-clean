@@ -107,18 +107,18 @@ app.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Nieprawidłowe dane" });
     }
 
-    const order = await pool.query(
-      `INSERT INTO orders (email, name, phone, address, cart)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id`,
-      [
-        customer.email,
-        customer.name,
-        customer.phone,
-        customer.address,
-        cart
-      ]
-    );
+    await pool.query(
+  `INSERT INTO orders (email, name, phone, address, cart)
+   VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+   RETURNING id`,
+  [
+    customer.email,
+    customer.name,
+    customer.phone,
+    JSON.stringify(customer.address),
+    JSON.stringify(cart)
+  ]
+);
 
     const orderId = order.rows[0].id;
 

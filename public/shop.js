@@ -1,13 +1,19 @@
+/* ================== PRODUKTY ================== */
+
 const products = [
   { id: "p1", name: "Brelok NFC", price: 29.99, image: "img/brelok.png" },
   { id: "p2", name: "Naklejka Logo", price: 14.99, image: "img/naklejka.png" },
   { id: "p3", name: "Plakietka QR", price: 39.99, image: "img/qr.png" }
 ];
 
+/* ================== ELEMENTY DOM ================== */
+
 const container = document.getElementById("products");
 const cartItemsDiv = document.getElementById("cart-items");
 const cartTotalSpan = document.getElementById("cart-total");
 const searchInput = document.getElementById("search");
+
+/* ================== KOSZYK ================== */
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -17,13 +23,18 @@ function saveCart() {
 
 function addToCart(id) {
   const product = products.find(p => p.id === id);
+  if (!product) return;
+
   const existing = cart.find(item => item.id === id);
 
   if (existing) {
     existing.quantity += 1;
   } else {
     cart.push({
-      ...product,
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
       quantity: 1
     });
   }
@@ -32,6 +43,19 @@ function addToCart(id) {
   renderCart();
 }
 
+function changeQty(id, delta) {
+  const item = cart.find(p => p.id === id);
+  if (!item) return;
+
+  item.quantity += delta;
+
+  if (item.quantity <= 0) {
+    cart = cart.filter(p => p.id !== id);
+  }
+
+  saveCart();
+  renderCart();
+}
 
 function clearCart() {
   cart = [];
@@ -39,7 +63,11 @@ function clearCart() {
   renderCart();
 }
 
+/* ================== RENDER KOSZYKA ================== */
+
 function renderCart() {
+  if (!cartItemsDiv || !cartTotalSpan) return;
+
   cartItemsDiv.innerHTML = "";
   let total = 0;
 
@@ -66,23 +94,12 @@ function renderCart() {
 
   cartTotalSpan.textContent = total.toFixed(2);
 }
-function changeQty(id, delta) {
-  const item = cart.find(p => p.id === id);
-  if (!item) return;
 
-  item.quantity += delta;
-
-  if (item.quantity <= 0) {
-    cart = cart.filter(p => p.id !== id);
-  }
-
-  saveCart();
-  renderCart();
-}
-
-
+/* ================== RENDER PRODUKTÓW ================== */
 
 function renderProducts(list) {
+  if (!container) return;
+
   container.innerHTML = "";
 
   list.forEach(p => {
@@ -90,21 +107,29 @@ function renderProducts(list) {
     div.className = "product";
     div.innerHTML = `
       <h3>${p.name}</h3>
-      <img src="${p.image}">
+      <img src="${p.image}" alt="${p.name}">
       <p>${p.price.toFixed(2)} zł</p>
-      <button onclick="addToCart('${p.id}')">Dodaj do koszyka</button>
+      <button onclick="addToCart('${p.id}')">
+        Dodaj do koszyka
+      </button>
     `;
     container.appendChild(div);
   });
 }
 
-searchInput.addEventListener("input", e => {
-  const value = e.target.value.toLowerCase();
-  renderProducts(products.filter(p => p.name.toLowerCase().includes(value)));
-});
+/* ================== WYSZUKIWARKA ================== */
 
-renderProducts(products);
-renderCart();
+if (searchInput) {
+  searchInput.addEventListener("input", e => {
+    const value = e.target.value.toLowerCase();
+    const filtered = products.filter(p =>
+      p.name.toLowerCase().includes(value)
+    );
+    renderProducts(filtered);
+  });
+}
+
+/* ================== CHECKOUT ================== */
 
 function checkout() {
   if (cart.length === 0) {
@@ -112,14 +137,11 @@ function checkout() {
     return;
   }
 
-  // Przechodzimy do strony z formularzem
+  // Przejście do formularza danych
   window.location.href = "/dane-platnosc.html";
 }
-function goToCheckout() {
-  if (cart.length === 0) {
-    alert("Koszyk jest pusty");
-    return;
-  }
 
-  window.location.href = "/dane-platnosc.html";
-}
+/* ================== START ================== */
+
+renderProducts(products);
+renderCart();
