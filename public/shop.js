@@ -105,3 +105,17 @@ function renderProducts(list) {
 
 renderProducts(products);
 renderCart();
+ 
+// Zamknięcie po kliknięciu w tło
+modal.addEventListener("click", function (e) {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+// Zamknięcie klawiszem ESC
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    closeModal();
+  }
+});
