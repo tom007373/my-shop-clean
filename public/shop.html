@@ -44,6 +44,7 @@
       border-radius: 15px;
       padding: 15px;
       text-align: center;
+      cursor: pointer;
     }
 
     .product img {
@@ -52,13 +53,37 @@
       object-fit: contain;
     }
 
-    .product button {
-      margin-top: 10px;
-      padding: 10px;
+    /* ===== POPUP ===== */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: #111;
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .modal-content select,
+    .modal-content input {
       width: 100%;
-      border-radius: 10px;
-      border: none;
+      margin-bottom: 12px;
+      padding: 8px;
+    }
+
+    .close-btn {
+      float: right;
       cursor: pointer;
+      font-size: 20px;
     }
 
     .cart {
@@ -69,24 +94,8 @@
     }
 
     .cart-item {
-      display: flex;
-      justify-content: space-between;
       margin-bottom: 10px;
-    }
-
-    .qty {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .qty button {
-      padding: 4px 10px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: cornflowerblue;
+      font-size: 0.9rem;
     }
 
     .checkout-btn {
@@ -104,30 +113,55 @@
 
 <body>
 
-  <div class="shop-header">Nasz sklep</div>
+<div class="shop-header">Nasz sklep</div>
 
-  <input
-    type="text"
-    id="search"
-    class="search"
-    placeholder="Szukaj produktu..."
-  >
+<input type="text" id="search" class="search" placeholder="Szukaj produktu...">
 
-  <div id="products" class="products-grid"></div>
+<div id="products" class="products-grid"></div>
 
-  <div class="cart">
-    <h2>Koszyk</h2>
-    <div id="cart-items"></div>
-    <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
+<!-- ===== POPUP ===== -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">✖</span>
+    <h2 id="modalName"></h2>
+    <img id="modalImage" width="100%">
 
-    <button onclick="clearCart()">Wyczyść koszyk</button>
+    <h4>Kolor</h4>
+    <select id="modalColor">
+      <option>Czarny</option>
+      <option>Biały</option>
+      <option>Niebieski</option>
+    </select>
 
-    <button class="checkout-btn" onclick="checkout()">
-      Przejdź dalej
+    <h4>Rozmiar</h4>
+    <select id="modalSize">
+      <option>S</option>
+      <option>M</option>
+      <option>L</option>
+    </select>
+
+    <h4>Twój napis</h4>
+    <input type="text" id="modalText" placeholder="Wpisz tekst">
+
+    <h4>Dodaj logo</h4>
+    <input type="file" id="modalLogo">
+
+    <button onclick="addConfiguredProduct()">
+      Dodaj do koszyka
     </button>
   </div>
+</div>
 
-  <script src="shop.js"></script>
+<div class="cart">
+  <h2>Koszyk</h2>
+  <div id="cart-items"></div>
+  <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
+
+  <button onclick="clearCart()">Wyczyść koszyk</button>
+  <button class="checkout-btn" onclick="checkout()">Przejdź dalej</button>
+</div>
+
+<script src="shop.js"></script>
 
 </body>
 </html>
