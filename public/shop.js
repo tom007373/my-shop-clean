@@ -32,22 +32,29 @@ function closeModal() {
 
 function addConfiguredProduct() {
 
-  const color = document.getElementById("modalColor").value;
+  const baseColor = document.getElementById("modalColor").value;
   const size = document.getElementById("modalSize").value;
   const text = document.getElementById("modalText").value;
+  const textColor = document.getElementById("modalTextColor").value;
 
   cart.push({
     id: selectedProduct.id,
     name: selectedProduct.name,
     price: selectedProduct.price,
     quantity: 1,
-    options: { color, size, text }
+    options: { 
+      baseColor,
+      size,
+      text,
+      textColor
+    }
   });
 
   saveCart();
   renderCart();
   closeModal();
 }
+
 
 function renderCart() {
   cartItemsDiv.innerHTML = "";
@@ -59,11 +66,12 @@ function renderCart() {
     const div = document.createElement("div");
     div.className = "cart-item";
     div.innerHTML = `
-      <strong>${item.name}</strong><br>
-      Kolor: ${item.options?.color || "-"} |
-      Rozmiar: ${item.options?.size || "-"} |
-      Tekst: ${item.options?.text || "-"}<br>
-      ${item.price.toFixed(2)} zł
+      <strong>${item.name}<strong>${item.name}</strong><br>
+  Podstawa: ${item.options?.baseColor || "-"} |
+  Rozmiar: ${item.options?.size || "-"}<br>
+  Napis: ${item.options?.text || "-"} 
+  (${item.options?.textColor || "-"})<br>
+  ${item.price.toFixed(2)} zł
     `;
     cartItemsDiv.appendChild(div);
   });
