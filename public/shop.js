@@ -1,7 +1,7 @@
 /* ================== PRODUKTY ================== */
 
 const products = [
-  { id: "p1", name: "Brelok NFC", price: 29.99, image: "public/img/brelok.png" },
+  { id: "p1", name: "Brelok NFC", price: 29.99, image: "img/brelok.png" },
   { id: "p2", name: "Naklejka Logo", price: 14.99, image: "img/naklejka.png" },
   { id: "p3", name: "Plakietka QR", price: 39.99, image: "img/qr.png" }
 ];
