@@ -93,23 +93,40 @@ function checkout() {
   window.location.href = "/dane-platnosc.html";
 }
 
-function renderProducts(list) {
-  container.innerHTML = "";
+function renderCart() {
+  cartItemsDiv.innerHTML = "";
+  let total = 0;
 
-  list.forEach(p => {
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.quantity;
+    total += itemTotal;
+
     const div = document.createElement("div");
-    div.className = "product";
+    div.className = "cart-item";
+
     div.innerHTML = `
-      <h3>${p.name}</h3>
-      <img src="${p.image}">
-      <p>${p.price.toFixed(2)} zł</p>
-      <button onclick="openModal('${p.id}')">
-        Personalizuj
-      </button>
+      <strong>${item.name}</strong><br>
+      Podstawa: ${item.options?.baseColor || "-"} |
+      Rozmiar: ${item.options?.size || "-"}<br>
+      Napis: ${item.options?.text || "-"} 
+      (${item.options?.textColor || "-"})<br>
+
+      <div class="qty">
+        <button onclick="changeQty(${index}, -1)">−</button>
+        <span>${item.quantity}</span>
+        <button onclick="changeQty(${index}, 1)">+</button>
+      </div>
+
+      <div>${itemTotal.toFixed(2)} zł</div>
+      <hr>
     `;
-    container.appendChild(div);
+
+    cartItemsDiv.appendChild(div);
   });
+
+  cartTotalSpan.textContent = total.toFixed(2);
 }
+
 
 renderProducts(products);
 renderCart();
