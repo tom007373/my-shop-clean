@@ -1,19 +1,38 @@
 /* ================== PRODUKTY ================== */
+/* type: "custom" = własny tekst + własne logo */
+/* type: "ready" = gotowy model (bez własnego tekstu/logo) */
 
 const products = [
-  { id: "p1", name: "Brelok NFC - Web logo ", price: 24.99, image: "brelok.png" },
-  { id: "p2", name: "Brelok NFC - Wi-Fi logo", price: 14.99, image: "" },
-  { id: "p3", name: "", price: 39.99, image: "" }
+  {
+    id: "p1",
+    name: "Brelok NFC – Pusty (Personalizowany)",
+    price: 29.99,
+    image: "brelok.png",
+    type: "custom"
+  },
+  {
+    id: "p2",
+    name: "Brelok NFC – Web Logo",
+    price: 29.99,
+    image: "brelok.png",
+    type: "ready"
+  },
+  {
+    id: "p3",
+    name: "Brelok NFC – WiFi Logo",
+    price: 29.99,
+    image: "brelok.png",
+    type: "ready"
+  }
 ];
 
-/* ================== ELEMENTY DOM ================== */
+/* ================== DOM ================== */
 
 const container = document.getElementById("products");
 const cartItemsDiv = document.getElementById("cart-items");
 const cartTotalSpan = document.getElementById("cart-total");
 const searchInput = document.getElementById("search");
 
-/* POPUP — poprawne ID */
 const popup = document.getElementById("productModal");
 const popupTitle = document.getElementById("modalName");
 const popupImage = document.getElementById("modalImage");
@@ -21,6 +40,7 @@ const popupBaseColor = document.getElementById("modalColor");
 const popupText = document.getElementById("modalText");
 const popupTextColor = document.getElementById("modalTextColor");
 const popupSize = document.getElementById("modalSize");
+const popupLogo = document.getElementById("modalLogo");
 
 let selectedProduct = null;
 
@@ -41,6 +61,15 @@ function openPopup(productId) {
   popupTitle.textContent = selectedProduct.name;
   popupImage.src = selectedProduct.image;
 
+  /* Dynamiczne opcje */
+  if (selectedProduct.type === "ready") {
+    popupText.parentElement.style.display = "none";
+    popupLogo.parentElement.style.display = "none";
+  } else {
+    popupText.parentElement.style.display = "block";
+    popupLogo.parentElement.style.display = "block";
+  }
+
   popup.style.display = "flex";
 }
 
@@ -48,7 +77,6 @@ function closeModal() {
   popup.style.display = "none";
 }
 
-/* klik poza popup */
 popup.addEventListener("click", e => {
   if (e.target === popup) closeModal();
 });
@@ -60,9 +88,10 @@ function addConfiguredProduct() {
 
   const config = {
     baseColor: popupBaseColor.value,
-    text: popupText.value,
+    size: popupSize.value,
+    text: selectedProduct.type === "custom" ? popupText.value : null,
     textColor: popupTextColor.value,
-    size: popupSize.value
+    logo: selectedProduct.type === "custom" ? popupLogo.files[0]?.name || null : null
   };
 
   const existing = cart.find(item =>
@@ -88,7 +117,7 @@ function addConfiguredProduct() {
   closeModal();
 }
 
-/* ================== ZMIANA ILOŚCI ================== */
+/* ================== ILOŚĆ ================== */
 
 function changeQty(index, delta) {
   cart[index].quantity += delta;
@@ -97,6 +126,12 @@ function changeQty(index, delta) {
     cart.splice(index, 1);
   }
 
+  saveCart();
+  renderCart();
+}
+
+function clearCart() {
+  cart = [];
   saveCart();
   renderCart();
 }
@@ -116,14 +151,15 @@ function renderCart() {
 
     div.innerHTML = `
       <strong>${item.name}</strong><br>
-      Podstawa: ${item.options?.baseColor || "-"} |
-      Rozmiar: ${item.options?.size || "-"}<br>
-      Napis: ${item.options?.text || "-"} 
-      (${item.options?.textColor || "-"})<br>
+      Podstawa: ${item.options.baseColor} |
+      Rozmiar: ${item.options.size}<br>
+      ${item.options.text ? `Napis: ${item.options.text}<br>` : ""}
+      ${item.options.logo ? `Logo: ${item.options.logo}<br>` : ""}
+      Kolor loga/napisu: ${item.options.textColor}<br>
 
-      <div class="qty">
+      <div>
         <button onclick="changeQty(${index}, -1)">−</button>
-        <span>${item.quantity}</span>
+        ${item.quantity}
         <button onclick="changeQty(${index}, 1)">+</button>
       </div>
 

@@ -1,224 +1,176 @@
-/* ================== PRODUKTY ================== */
-/* type: "custom" = własny tekst + własne logo */
-/* type: "ready" = gotowy model (bez własnego tekstu/logo) */
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>D&P Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const products = [
-  {
-    id: "p1",
-    name: "Brelok NFC – Pusty (Personalizowany)",
-    price: 29.99,
-    image: "brelok.png",
-    type: "custom"
-  },
-  {
-    id: "p2",
-    name: "Brelok NFC – Web Logo",
-    price: 29.99,
-    image: "brelok.png",
-    type: "ready"
-  },
-  {
-    id: "p3",
-    name: "Brelok NFC – WiFi Logo",
-    price: 29.99,
-    image: "brelok.png",
-    type: "ready"
-  }
-];
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
+      color: #fff;
+    }
 
-/* ================== DOM ================== */
+    .shop-header {
+      width: 100%;
+      background: #0300a7;
+      text-align: center;
+      padding: 20px;
+      font-size: 2.2rem;
+    }
 
-const container = document.getElementById("products");
-const cartItemsDiv = document.getElementById("cart-items");
-const cartTotalSpan = document.getElementById("cart-total");
-const searchInput = document.getElementById("search");
+    .search {
+      width: 90%;
+      max-width: 400px;
+      margin: 20px auto;
+      display: block;
+      padding: 10px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+    }
 
-const popup = document.getElementById("productModal");
-const popupTitle = document.getElementById("modalName");
-const popupImage = document.getElementById("modalImage");
-const popupBaseColor = document.getElementById("modalColor");
-const popupText = document.getElementById("modalText");
-const popupTextColor = document.getElementById("modalTextColor");
-const popupSize = document.getElementById("modalSize");
-const popupLogo = document.getElementById("modalLogo");
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
 
-let selectedProduct = null;
+    .product {
+      background: #004ea7;
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+    }
 
-/* ================== KOSZYK ================== */
+    .product img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+    }
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    /* ===== POPUP ===== */
 
-function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
 
-/* ================== POPUP ================== */
+    .modal-content {
+      background: #111;
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+    }
 
-function openPopup(productId) {
-  selectedProduct = products.find(p => p.id === productId);
-  if (!selectedProduct) return;
+    .modal-content select,
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 8px;
+    }
 
-  popupTitle.textContent = selectedProduct.name;
-  popupImage.src = selectedProduct.image;
+    .close-btn {
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+    }
 
-  /* Dynamiczne opcje */
-  if (selectedProduct.type === "ready") {
-    popupText.parentElement.style.display = "none";
-    popupLogo.parentElement.style.display = "none";
-  } else {
-    popupText.parentElement.style.display = "block";
-    popupLogo.parentElement.style.display = "block";
-  }
+    .cart {
+      background: #1a1a1a;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 15px;
+    }
 
-  popup.style.display = "flex";
-}
+    .cart-item {
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
 
-function closeModal() {
-  popup.style.display = "none";
-}
+    .checkout-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: cornflowerblue;
+    }
+  </style>
+</head>
 
-popup.addEventListener("click", e => {
-  if (e.target === popup) closeModal();
-});
+<body>
 
-/* ================== DODAWANIE DO KOSZYKA ================== */
+<div class="shop-header">Nasz sklep</div>
 
-function addConfiguredProduct() {
-  if (!selectedProduct) return;
+<input type="text" id="search" class="search" placeholder="Szukaj produktu...">
 
-  const config = {
-    baseColor: popupBaseColor.value,
-    size: popupSize.value,
-    text: selectedProduct.type === "custom" ? popupText.value : null,
-    textColor: popupTextColor.value,
-    logo: selectedProduct.type === "custom" ? popupLogo.files[0]?.name || null : null
-  };
+<div id="products" class="products-grid"></div>
 
-  const existing = cart.find(item =>
-    item.id === selectedProduct.id &&
-    JSON.stringify(item.options) === JSON.stringify(config)
-  );
+<!-- ===== POPUP ===== -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">✖</span>
+    <h2 id="modalName"></h2>
+    <img id="modalImage" width="70%" height="300px">
 
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      price: selectedProduct.price,
-      image: selectedProduct.image,
-      quantity: 1,
-      options: config
-    });
-  }
+    <h4>Kolor</h4>
+    <select id="modalColor">
+      <option>Czarny</option>
+      <option>Biały</option>
+      <option>Niebieski</option>
+    </select>
 
-  saveCart();
-  renderCart();
-  closeModal();
-}
+    <h4>Rozmiar</h4>
+    <select id="modalSize">
+      <option>S</option>
+      <option>M</option>
+      <option>L</option>
+    </select>
 
-/* ================== ILOŚĆ ================== */
+    <h4>Twój napis</h4>
+<input type="text" id="modalText" placeholder="Wpisz tekst">
 
-function changeQty(index, delta) {
-  cart[index].quantity += delta;
+<h4>Kolor napisu/loga (kolor loga obowiązuje tylko w przypadku jednokolorowego logo)</h4>
+<select id="modalTextColor">
+  <option value="Biały">Biały</option>
+  <option value="czarny">Czarny</option>
+  <option value="zielony">zielony</option>
+  <option value="czerwony">Czerwony</option>
+  <option value="Niebieski">Niebieski</option>
+</select>
 
-  if (cart[index].quantity <= 0) {
-    cart.splice(index, 1);
-  }
+    <h4>Dodaj logo</h4>
+    <input type="file" id="modalLogo">
 
-  saveCart();
-  renderCart();
-}
+    <button onclick="addConfiguredProduct()">
+      Dodaj do koszyka
+    </button>
+  </div>
+</div>
 
-function clearCart() {
-  cart = [];
-  saveCart();
-  renderCart();
-}
+<div class="cart">
+  <h2>Koszyk</h2>
+  <div id="cart-items"></div>
+  <p><strong>Suma:</strong> <span id="cart-total">0.00</span> zł</p>
 
-/* ================== RENDER KOSZYKA ================== */
+  <button onclick="clearCart()">Wyczyść koszyk</button>
+  <button class="checkout-btn" onclick="checkout()">Przejdź dalej</button>
+</div>
 
-function renderCart() {
-  cartItemsDiv.innerHTML = "";
-  let total = 0;
+<script src="shop.js"></script>
 
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
-
-    const div = document.createElement("div");
-    div.className = "cart-item";
-
-    div.innerHTML = `
-      <strong>${item.name}</strong><br>
-      Podstawa: ${item.options.baseColor} |
-      Rozmiar: ${item.options.size}<br>
-      ${item.options.text ? `Napis: ${item.options.text}<br>` : ""}
-      ${item.options.logo ? `Logo: ${item.options.logo}<br>` : ""}
-      Kolor loga/napisu: ${item.options.textColor}<br>
-
-      <div>
-        <button onclick="changeQty(${index}, -1)">−</button>
-        ${item.quantity}
-        <button onclick="changeQty(${index}, 1)">+</button>
-      </div>
-
-      <div>${itemTotal.toFixed(2)} zł</div>
-      <hr>
-    `;
-
-    cartItemsDiv.appendChild(div);
-  });
-
-  cartTotalSpan.textContent = total.toFixed(2);
-}
-
-/* ================== PRODUKTY ================== */
-
-function renderProducts(list) {
-  container.innerHTML = "";
-
-  list.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "product";
-
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <img src="${p.image}" alt="${p.name}">
-      <p>${p.price.toFixed(2)} zł</p>
-      <button onclick="openPopup('${p.id}')">
-        Personalizuj
-      </button>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-/* ================== WYSZUKIWARKA ================== */
-
-searchInput.addEventListener("input", e => {
-  const value = e.target.value.toLowerCase();
-
-  renderProducts(
-    products.filter(p =>
-      p.name.toLowerCase().includes(value)
-    )
-  );
-});
-
-/* ================== CHECKOUT ================== */
-
-function checkout() {
-  if (cart.length === 0) {
-    alert("Koszyk jest pusty");
-    return;
-  }
-
-  window.location.href = "/dane-platnosc.html";
-}
-
-/* ================== START ================== */
-
-renderProducts(products);
-renderCart();
+</body>
+</html>
