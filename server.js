@@ -32,7 +32,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 const upload = multer({
-  storage: multer.memoryStorage(), // trzymamy w pamięci
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname);
+    }
+  })
 });
 /* ================== BEZPIECZNY DB INIT ================== */
 
