@@ -2,8 +2,8 @@
 
 const products = [
   { id: "p1", name: "Brelok NFC - Web logo ", price: 24.99, image: "brelok.png" },
-  { id: "p2", name: "Brelok NFC - Wi-Fi logo", price: 14.99, image: "img/naklejka.png" },
-  { id: "p3", name: "", price: 39.99, image: "img/qr.png" }
+  { id: "p2", name: "Brelok NFC - Wi-Fi logo", price: 14.99, image: "" },
+  { id: "p3", name: "", price: 39.99, image: "" }
 ];
 
 /* ================== ELEMENTY DOM ================== */
