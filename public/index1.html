@@ -116,29 +116,67 @@
     ZMATERIALIZUJ SWÓJ PROJEKT...
   </div>
 
-  <form action="/upload" method="post" enctype="multipart/form-data">
+<form id="projectForm" enctype="multipart/form-data">
 
-    <div class="container">
+  <div class="container">
 
-      <div class="box">
-        ... OPISUJĄC GO **
-        <textarea placeholder="Czarny brelok z chipem nfc z białym znaczkiem „web logo”" disabled></textarea>
-      </div>
-
-      <div class="box upload">
-        ... PRZESYŁAJĄC GO DO NAS<br>
-        <input type="file">
-      </div>
-
+    <div class="box">
+      ... OPISUJĄC GO **
+      <textarea 
+        name="description"
+        placeholder="Opisz dokładnie projekt (kolor, rozmiar, zastosowanie...)">
+      </textarea>
     </div>
 
-    <div class="extra">
-      Dodatkowe pliki
-      <br><br>
-      <input type="file" name="files[]" multiple>
+    <div class="box upload">
+      ... PRZESYŁAJĄC GO DO NAS<br>
+      <input type="file" name="mainFile">
     </div>
 
-  </form>
+  </div>
 
+  <div class="extra">
+    Dodatkowe pliki
+    <br><br>
+    <input type="file" name="extraFiles[]" multiple>
+  </div>
+
+  <div style="text-align:center; margin:20px;">
+    <button type="submit" id="submitBtn" style="
+      padding:15px 30px;
+      font-size:18px;
+      background:rgb(0,104,145);
+      color:white;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;">
+      WYŚLIJ PROJEKT
+    </button>
+  </div>
+
+</form>
+<script>
+const form = document.getElementById("projectForm");
+const popup = document.getElementById("popup");
+const submitBtn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  submitBtn.disabled = true;
+  submitBtn.innerText = "WYSYŁANIE...";
+
+  setTimeout(()=>{
+    popup.style.display = "block";
+    submitBtn.disabled = false;
+    submitBtn.innerText = "WYŚLIJ PROJEKT";
+    form.reset();
+  }, 1000);
+});
+
+function closePopup(){
+  popup.style.display = "none";
+}
+</script>
 </body>
 </html>
