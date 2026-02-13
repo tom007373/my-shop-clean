@@ -5,7 +5,7 @@ const express = require("express");
 const path = require("path");
 const Stripe = require("stripe");
 const { Pool } = require("pg");
-
+const multer = require("multer");
 /* ================== WALIDACJA ENV ================== */
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ BRAK STRIPE_SECRET_KEY");
@@ -31,6 +31,9 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+const upload = multer({
+  storage: multer.memoryStorage(), // trzymamy w pamięci
+});
 /* ================== BEZPIECZNY DB INIT ================== */
 
 async function initDatabase() {
@@ -64,6 +67,16 @@ async function initDatabase() {
     console.error("❌ DB connection error (will retry):", err.message);
     setTimeout(initDatabase, 5000); // próba ponownie za 5 sek
   }
+  await pool.query(`
+  CREATE TABLE IF NOT EXISTS custom_projects (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    main_file TEXT,
+    extra_files JSONB,
+    status TEXT DEFAULT 'new',
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+`);
 }
 
 initDatabase();
@@ -97,7 +110,40 @@ app.post("/newsletter", async (req, res) => {
     res.status(500).json({ error: "Błąd zapisu" });
   }
 });
+/* ===== CUSTOM PROJECT UPLOAD ===== */
 
+app.post("/project-upload", upload.fields([
+  { name: "mainFile", maxCount: 1 },
+  { name: "extraFiles", maxCount: 5 }
+]), async (req, res) => {
+
+  try {
+    const { description } = req.body;
+
+    if (!description) {
+      return res.status(400).json({ error: "Brak opisu" });
+    }
+
+    const mainFile = req.files["mainFile"]?.[0]?.originalname || null;
+
+    const extraFiles = req.files["extraFiles"]
+      ? req.files["extraFiles"].map(f => f.originalname)
+      : [];
+
+    await pool.query(
+      `INSERT INTO custom_projects (description, main_file, extra_files)
+       VALUES ($1, $2, $3::jsonb)`,
+      [description, mainFile, JSON.stringify(extraFiles)]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("❌ Project upload error:", err.message);
+    res.status(500).json({ error: "Błąd zapisu projektu" });
+  }
+
+});
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
   try {
