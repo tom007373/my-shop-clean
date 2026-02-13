@@ -54,6 +54,9 @@ function saveCart() {
 
 /* ================== POPUP ================== */
 
+const textWrapper = document.getElementById("textWrapper");
+const logoWrapper = document.getElementById("logoWrapper");
+
 function openPopup(productId) {
   selectedProduct = products.find(p => p.id === productId);
   if (!selectedProduct) return;
@@ -61,25 +64,16 @@ function openPopup(productId) {
   popupTitle.textContent = selectedProduct.name;
   popupImage.src = selectedProduct.image;
 
-  /* Dynamiczne opcje */
   if (selectedProduct.type === "ready") {
-    popupText.parentElement.style.display = "none";
-    popupLogo.parentElement.style.display = "none";
+    textWrapper.style.display = "none";
+    logoWrapper.style.display = "none";
   } else {
-    popupText.parentElement.style.display = "block";
-    popupLogo.parentElement.style.display = "block";
+    textWrapper.style.display = "block";
+    logoWrapper.style.display = "block";
   }
 
   popup.style.display = "flex";
 }
-
-function closeModal() {
-  popup.style.display = "none";
-}
-
-popup.addEventListener("click", e => {
-  if (e.target === popup) closeModal();
-});
 
 /* ================== DODAWANIE DO KOSZYKA ================== */
 

@@ -140,20 +140,24 @@
       <option>L</option>
     </select>
 
-    <h4>Twój napis</h4>
-<input type="text" id="modalText" placeholder="Wpisz tekst">
+<h4>Twój napis</h4>
+<div id="textWrapper">
+  <input type="text" id="modalText" placeholder="Wpisz tekst">
+</div>
 
-<h4>Kolor napisu/loga (kolor loga obowiązuje tylko w przypadku jednokolorowego logo)</h4>
+<h4>Kolor napisu/loga</h4>
 <select id="modalTextColor">
   <option value="Biały">Biały</option>
-  <option value="czarny">Czarny</option>
-  <option value="zielony">zielony</option>
-  <option value="czerwony">Czerwony</option>
+  <option value="Czarny">Czarny</option>
+  <option value="Zielony">Zielony</option>
+  <option value="Czerwony">Czerwony</option>
   <option value="Niebieski">Niebieski</option>
 </select>
 
-    <h4>Dodaj logo</h4>
-    <input type="file" id="modalLogo">
+<h4>Dodaj logo</h4>
+<div id="logoWrapper">
+  <input type="file" id="modalLogo">
+</div>
 
     <button onclick="addConfiguredProduct()">
       Dodaj do koszyka
