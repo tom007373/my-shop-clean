@@ -8,9 +8,22 @@ const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
 
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
+const uploadPath = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
 }
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname);
+    }
+  })
+});
 /* ================== WALIDACJA ENV ================== */
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ BRAK STRIPE_SECRET_KEY");
