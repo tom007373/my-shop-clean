@@ -1,218 +1,160 @@
 /* ================== PRODUKTY ================== */
-/* type: "custom" = własny tekst + własne logo */
-/* type: "ready" = gotowy model (bez własnego tekstu/logo) */
 
 const products = [
-  {
-    id: "p1",
-    name: "Brelok NFC – Pusty (Personalizowany)",
-    price: 29.99,
-    image: "brelok.png",
-    type: "custom"
-  },
-  {
-    id: "p2",
-    name: "Brelok NFC – Web Logo",
-    price: 29.99,
-    image: "brelok.png",
-    type: "ready"
-  },
-  {
-    id: "p3",
-    name: "Brelok NFC – WiFi Logo",
-    price: 29.99,
-    image: "brelok.png",
-    type: "ready"
-  }
+  { id:"p1", name:"Brelok NFC – Personalizowany", price:29.99, image:"brelok.png", type:"custom" },
+  { id:"p2", name:"Brelok NFC – Web Logo", price:29.99, image:"brelok.png", type:"ready" },
+  { id:"p3", name:"Brelok NFC – WiFi Logo", price:29.99, image:"brelok.png", type:"ready" }
 ];
 
 /* ================== DOM ================== */
 
 const container = document.getElementById("products");
-const cartItemsDiv = document.getElementById("cart-items");
-const cartTotalSpan = document.getElementById("cart-total");
-const searchInput = document.getElementById("search");
-
 const popup = document.getElementById("productModal");
+const closeBtn = document.getElementById("closeModal");
+const addBtn = document.getElementById("addToCartBtn");
+
 const popupTitle = document.getElementById("modalName");
 const popupImage = document.getElementById("modalImage");
-const popupBaseColor = document.getElementById("modalColor");
+const popupColor = document.getElementById("modalColor");
+const popupSize = document.getElementById("modalSize");
 const popupText = document.getElementById("modalText");
 const popupTextColor = document.getElementById("modalTextColor");
-const popupSize = document.getElementById("modalSize");
 const popupLogo = document.getElementById("modalLogo");
 
+const textSection = document.getElementById("textSection");
+const logoSection = document.getElementById("logoSection");
+
+const cartItemsDiv = document.getElementById("cart-items");
+const cartTotalSpan = document.getElementById("cart-total");
+
 let selectedProduct = null;
-
-/* ================== KOSZYK ================== */
-
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
 
 /* ================== POPUP ================== */
 
-const textWrapper = document.getElementById("textWrapper");
-const logoWrapper = document.getElementById("logoWrapper");
-
-function openPopup(productId) {
-  selectedProduct = products.find(p => p.id === productId);
-  if (!selectedProduct) return;
+function openPopup(id){
+  selectedProduct = products.find(p => p.id === id);
+  if(!selectedProduct) return;
 
   popupTitle.textContent = selectedProduct.name;
   popupImage.src = selectedProduct.image;
 
-  if (selectedProduct.type === "ready") {
-    textWrapper.style.display = "none";
-    logoWrapper.style.display = "none";
+  if(selectedProduct.type === "ready"){
+    textSection.style.display = "none";
+    logoSection.style.display = "none";
   } else {
-    textWrapper.style.display = "block";
-    logoWrapper.style.display = "block";
+    textSection.style.display = "block";
+    logoSection.style.display = "block";
   }
 
   popup.style.display = "flex";
 }
 
-/* ================== DODAWANIE DO KOSZYKA ================== */
+function closeModal(){
+  popup.style.display = "none";
+  popupText.value = "";
+  popupLogo.value = "";
+}
 
-function addConfiguredProduct() {
-  if (!selectedProduct) return;
+closeBtn.onclick = closeModal;
 
-  const config = {
-    baseColor: popupBaseColor.value,
-    size: popupSize.value,
-    text: selectedProduct.type === "custom" ? popupText.value : null,
-    textColor: popupTextColor.value,
-    logo: selectedProduct.type === "custom" ? popupLogo.files[0]?.name || null : null
+window.onclick = function(e){
+  if(e.target === popup) closeModal();
+};
+
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape") closeModal();
+});
+
+/* ================== KOSZYK ================== */
+
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function renderCart(){
+  cartItemsDiv.innerHTML="";
+  let total=0;
+
+  cart.forEach((item,i)=>{
+    total+=item.price*item.quantity;
+
+    cartItemsDiv.innerHTML+=`
+      <div>
+        <strong>${item.name}</strong><br>
+        ${item.options.baseColor} | ${item.options.size}<br>
+        ${item.options.text ? "Napis: "+item.options.text+"<br>" : ""}
+        Ilość: ${item.quantity}
+        <button onclick="changeQty(${i},-1)">-</button>
+        <button onclick="changeQty(${i},1)">+</button>
+        <hr>
+      </div>
+    `;
+  });
+
+  cartTotalSpan.textContent=total.toFixed(2);
+}
+
+function changeQty(i,delta){
+  cart[i].quantity+=delta;
+  if(cart[i].quantity<=0) cart.splice(i,1);
+  saveCart();
+  renderCart();
+}
+
+function addToCart(){
+  if(!selectedProduct) return;
+
+  const options={
+    baseColor:popupColor.value,
+    size:popupSize.value,
+    text:selectedProduct.type==="custom"?popupText.value:null
   };
 
-  const existing = cart.find(item =>
-    item.id === selectedProduct.id &&
-    JSON.stringify(item.options) === JSON.stringify(config)
-  );
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      price: selectedProduct.price,
-      image: selectedProduct.image,
-      quantity: 1,
-      options: config
-    });
-  }
+  cart.push({
+    id:selectedProduct.id,
+    name:selectedProduct.name,
+    price:selectedProduct.price,
+    quantity:1,
+    options
+  });
 
   saveCart();
   renderCart();
   closeModal();
 }
 
-/* ================== ILOŚĆ ================== */
+addBtn.onclick = addToCart;
 
-function changeQty(index, delta) {
-  cart[index].quantity += delta;
-
-  if (cart[index].quantity <= 0) {
-    cart.splice(index, 1);
-  }
-
+document.getElementById("clearCartBtn").onclick = ()=>{
+  cart=[];
   saveCart();
   renderCart();
-}
+};
 
-function clearCart() {
-  cart = [];
-  saveCart();
-  renderCart();
-}
-
-/* ================== RENDER KOSZYKA ================== */
-
-function renderCart() {
-  cartItemsDiv.innerHTML = "";
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
-
-    const div = document.createElement("div");
-    div.className = "cart-item";
-
-    div.innerHTML = `
-      <strong>${item.name}</strong><br>
-      Podstawa: ${item.options.baseColor} |
-      Rozmiar: ${item.options.size}<br>
-      ${item.options.text ? `Napis: ${item.options.text}<br>` : ""}
-      ${item.options.logo ? `Logo: ${item.options.logo}<br>` : ""}
-      Kolor loga/napisu: ${item.options.textColor}<br>
-
-      <div>
-        <button onclick="changeQty(${index}, -1)">−</button>
-        ${item.quantity}
-        <button onclick="changeQty(${index}, 1)">+</button>
-      </div>
-
-      <div>${itemTotal.toFixed(2)} zł</div>
-      <hr>
-    `;
-
-    cartItemsDiv.appendChild(div);
-  });
-
-  cartTotalSpan.textContent = total.toFixed(2);
-}
-
-/* ================== PRODUKTY ================== */
-
-function renderProducts(list) {
-  container.innerHTML = "";
-
-  list.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "product";
-
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <img src="${p.image}" alt="${p.name}">
-      <p>${p.price.toFixed(2)} zł</p>
-      <button onclick="openPopup('${p.id}')">
-        Personalizuj
-      </button>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-/* ================== WYSZUKIWARKA ================== */
-
-searchInput.addEventListener("input", e => {
-  const value = e.target.value.toLowerCase();
-
-  renderProducts(
-    products.filter(p =>
-      p.name.toLowerCase().includes(value)
-    )
-  );
-});
-
-/* ================== CHECKOUT ================== */
-
-function checkout() {
-  if (cart.length === 0) {
+document.getElementById("checkoutBtn").onclick = ()=>{
+  if(cart.length===0){
     alert("Koszyk jest pusty");
     return;
   }
+  window.location.href="/dane-platnosc.html";
+};
 
-  window.location.href = "/dane-platnosc.html";
+/* ================== PRODUKTY ================== */
+
+function renderProducts(){
+  container.innerHTML="";
+  products.forEach(p=>{
+    container.innerHTML+=`
+      <div class="product">
+        <h3>${p.name}</h3>
+        <img src="${p.image}">
+        <p>${p.price.toFixed(2)} zł</p>
+        <button onclick="openPopup('${p.id}')">Personalizuj</button>
+      </div>
+    `;
+  });
 }
 
-/* ================== START ================== */
-
-renderProducts(products);
+renderProducts();
 renderCart();
