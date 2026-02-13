@@ -6,6 +6,11 @@ const path = require("path");
 const Stripe = require("stripe");
 const { Pool } = require("pg");
 const multer = require("multer");
+const fs = require("fs");
+
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 /* ================== WALIDACJA ENV ================== */
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ BRAK STRIPE_SECRET_KEY");
