@@ -4,7 +4,7 @@ const products = [
   { id:"p1", name:"Brelok NFC – Personalizowany", price:29.99, image:"brelok.png", type:"custom" },
   { id:"p2", name:"Brelok NFC – Web Logo", price:29.99, image:"brelok.png", type:"ready" },
   { id:"p3", name:"Brelok NFC – WiFi Logo", price:29.99, image:"brelok.png", type:"ready" },
-  { id:"p4", name:"Karta NFC – Personalizowana", price:29.99, image:"brelok.png", type:"custom" }
+  { id:"p4", name:"Karta NFC – Personalizowana", price:29.99, image:"karta_nfc.png", type:"custom" }
 ];
 
 /* ================== DOM ================== */
