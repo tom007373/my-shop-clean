@@ -8,12 +8,23 @@ const { Pool } = require("pg");
 const multer = require("multer");
 const fs = require("fs");
 
+/* ================== WALIDACJA ENV ================== */
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("❌ BRAK STRIPE_SECRET_KEY");
+}
+
+if (!process.env.DATABASE_URL) {
+  console.error("❌ BRAK DATABASE_URL");
+}
+
+/* ================== ŚCIEŻKA UPLOAD ================== */
 const uploadPath = path.join(__dirname, "uploads");
 
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+/* ================== MULTER (TYLKO RAZ!) ================== */
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
@@ -24,14 +35,6 @@ const upload = multer({
     }
   })
 });
-/* ================== WALIDACJA ENV ================== */
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("❌ BRAK STRIPE_SECRET_KEY");
-}
-
-if (!process.env.DATABASE_URL) {
-  console.error("❌ BRAK DATABASE_URL");
-}
 
 /* ================== DB ================== */
 const pool = new Pool({
@@ -49,18 +52,7 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname);
-    }
-  })
-});
-/* ================== BEZPIECZNY DB INIT ================== */
-
+/* ================== INIT DATABASE ================== */
 async function initDatabase() {
   try {
     await pool.query(`SELECT 1`);
@@ -87,21 +79,23 @@ async function initDatabase() {
       );
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS custom_projects (
+        id SERIAL PRIMARY KEY,
+        description TEXT NOT NULL,
+        main_file TEXT,
+        extra_files JSONB,
+        status TEXT DEFAULT 'new',
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
     console.log("✅ Database ready");
+
   } catch (err) {
-    console.error("❌ DB connection error (will retry):", err.message);
-    setTimeout(initDatabase, 5000); // próba ponownie za 5 sek
+    console.error("❌ DB connection error:", err.message);
+    setTimeout(initDatabase, 5000);
   }
-  await pool.query(`
-  CREATE TABLE IF NOT EXISTS custom_projects (
-    id SERIAL PRIMARY KEY,
-    description TEXT NOT NULL,
-    main_file TEXT,
-    extra_files JSONB,
-    status TEXT DEFAULT 'new',
-    created_at TIMESTAMP DEFAULT NOW()
-  );
-`);
 }
 
 initDatabase();
@@ -135,40 +129,44 @@ app.post("/newsletter", async (req, res) => {
     res.status(500).json({ error: "Błąd zapisu" });
   }
 });
+
 /* ===== CUSTOM PROJECT UPLOAD ===== */
+app.post(
+  "/project-upload",
+  upload.fields([
+    { name: "mainFile", maxCount: 1 },
+    { name: "extraFiles", maxCount: 5 }
+  ]),
+  async (req, res) => {
+    try {
+      const { description } = req.body;
 
-app.post("/project-upload", upload.fields([
-  { name: "mainFile", maxCount: 1 },
-  { name: "extraFiles", maxCount: 5 }
-]), async (req, res) => {
+      if (!description) {
+        return res.status(400).json({ error: "Brak opisu" });
+      }
 
-  try {
-    const { description } = req.body;
+      const mainFile =
+        req.files?.mainFile?.[0]?.filename || null;
 
-    if (!description) {
-      return res.status(400).json({ error: "Brak opisu" });
+      const extraFiles = req.files?.extraFiles
+        ? req.files.extraFiles.map(f => f.filename)
+        : [];
+
+      await pool.query(
+        `INSERT INTO custom_projects (description, main_file, extra_files)
+         VALUES ($1, $2, $3::jsonb)`,
+        [description, mainFile, JSON.stringify(extraFiles)]
+      );
+
+      res.json({ success: true });
+
+    } catch (err) {
+      console.error("❌ Project upload error:", err);
+      res.status(500).json({ error: "Błąd zapisu projektu" });
     }
-
-    const mainFile = req.files["mainFile"]?.[0]?.originalname || null;
-
-    const extraFiles = req.files["extraFiles"]
-      ? req.files["extraFiles"].map(f => f.originalname)
-      : [];
-
-    await pool.query(
-      `INSERT INTO custom_projects (description, main_file, extra_files)
-       VALUES ($1, $2, $3::jsonb)`,
-      [description, mainFile, JSON.stringify(extraFiles)]
-    );
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error("❌ Project upload error:", err.message);
-    res.status(500).json({ error: "Błąd zapisu projektu" });
   }
+);
 
-});
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
   try {
@@ -178,7 +176,6 @@ app.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Nieprawidłowe dane" });
     }
 
-    // ✅ zapis do bazy
     const orderResult = await pool.query(
       `INSERT INTO orders (email, name, phone, address, cart)
        VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
@@ -194,44 +191,37 @@ app.post("/checkout", async (req, res) => {
 
     const orderId = orderResult.rows[0].id;
 
-    // ✅ budujemy line items do Stripe
     const line_items = cart.map(item => ({
       price_data: {
         currency: "pln",
-        product_data: {
-          name: item.name
-        },
+        product_data: { name: item.name },
         unit_amount: Math.round(item.price * 100)
       },
       quantity: item.quantity
     }));
 
-    // ✅ tworzymy sesję Stripe
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
       success_url: `${process.env.DOMAIN}/success.html`,
       cancel_url: `${process.env.DOMAIN}/cancel.html`,
-      metadata: {
-        order_id: orderId
-      }
+      metadata: { order_id: orderId }
     });
 
     res.json({ url: session.url });
 
   } catch (err) {
-    console.error("❌ Checkout error:", err.message);
+    console.error("❌ Checkout error:", err);
     res.status(500).json({ error: "Błąd płatności" });
   }
 });
-/* ================== START ================== */
 
+/* ================== START ================== */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Server listening on port", PORT);
 });
 
 /* ================== SHUTDOWN ================== */
-
 process.on("SIGTERM", () => {
   console.log("⚠️ SIGTERM from Railway (normal shutdown)");
-}); 
+});
