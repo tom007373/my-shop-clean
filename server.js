@@ -51,7 +51,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
+app.use("/uploads", express.static(uploadPath));
 /* ================== INIT DATABASE ================== */
 async function initDatabase() {
   try {
