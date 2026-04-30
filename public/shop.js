@@ -74,88 +74,165 @@ function saveCart(){
 }
 
 function renderCart(){
-  cartItemsDiv.innerHTML="";
-  let total=0;
+  cartItemsDiv.innerHTML = "";
+  let total = 0;
 
   cart.forEach((item,i)=>{
-    total+=item.price*item.quantity;
+    total += item.price * item.quantity;
 
-    cartItemsDiv.innerHTML+=`
+    cartItemsDiv.innerHTML += `
       <div>
         <strong>${item.name}</strong><br>
         ${item.options.baseColor} | ${item.options.size}<br>
-        ${item.options.text ? "Napis: "+item.options.text+"<br>" : ""}
+
+        ${item.options.text ? `Napis: ${item.options.text}<br>` : ""}
+
+        ${item.options.logo ? `Logo: ${item.options.logo}<br>` : ""}
+
         Ilość: ${item.quantity}
+
         <button onclick="changeQty(${i},-1)">-</button>
         <button onclick="changeQty(${i},1)">+</button>
+
         <hr>
       </div>
     `;
   });
 
-  cartTotalSpan.textContent=total.toFixed(2);
+  cartTotalSpan.textContent = total.toFixed(2);
 }
 
 function changeQty(i,delta){
-  cart[i].quantity+=delta;
-  if(cart[i].quantity<=0) cart.splice(i,1);
+  cart[i].quantity += delta;
+
+  if(cart[i].quantity <= 0){
+    cart.splice(i,1);
+  }
+
   saveCart();
   renderCart();
 }
 
-function addToCart(){
-  if(!selectedProduct) return;
+/* ================== UPLOAD PLIKU ================== */
 
-  const options={
-    baseColor:popupColor.value,
-    size:popupSize.value,
-    text:selectedProduct.type==="custom"?popupText.value:null
-  };
+async function uploadLogoFile(file){
 
-  cart.push({
-    id:selectedProduct.id,
-    name:selectedProduct.name,
-    price:selectedProduct.price,
-    quantity:1,
-    options
+  const formData = new FormData();
+
+  formData.append("description","logo upload");
+  formData.append("mainFile", file);
+
+  const response = await fetch("/project-upload", {
+    method:"POST",
+    body:formData
   });
 
-  saveCart();
-  renderCart();
-  closeModal();
+  const data = await response.json();
+
+  if(!response.ok){
+    throw new Error(data.error || "Błąd uploadu");
+  }
+
+  return data.uploaded.mainFile;
+}
+
+/* ================== ADD TO CART ================== */
+
+async function addToCart(){
+
+  if(!selectedProduct) return;
+
+  let uploadedLogo = null;
+
+  try{
+
+    const selectedFile = popupLogo.files[0];
+
+    if(selectedProduct.type === "custom" && selectedFile){
+      addBtn.disabled = true;
+      addBtn.textContent = "Wysyłanie pliku...";
+
+      uploadedLogo = await uploadLogoFile(selectedFile);
+    }
+
+    const options = {
+      baseColor: popupColor.value,
+      size: popupSize.value,
+      text: selectedProduct.type === "custom"
+        ? popupText.value
+        : null,
+      textColor: popupTextColor.value,
+      logo: uploadedLogo
+    };
+
+    cart.push({
+      id:selectedProduct.id,
+      name:selectedProduct.name,
+      price:selectedProduct.price,
+      quantity:1,
+      options
+    });
+
+    saveCart();
+    renderCart();
+    closeModal();
+
+  }catch(err){
+
+    alert("Błąd wysyłania pliku.");
+
+    console.error(err);
+
+  }finally{
+
+    addBtn.disabled = false;
+    addBtn.textContent = "Dodaj do koszyka";
+  }
 }
 
 addBtn.onclick = addToCart;
 
+/* ================== BUTTONY ================== */
+
 document.getElementById("clearCartBtn").onclick = ()=>{
-  cart=[];
+  cart = [];
   saveCart();
   renderCart();
 };
 
 document.getElementById("checkoutBtn").onclick = ()=>{
-  if(cart.length===0){
+
+  if(cart.length === 0){
     alert("Koszyk jest pusty");
     return;
   }
-  window.location.href="/dane-platnosc.html";
+
+  window.location.href = "/dane-platnosc.html";
 };
 
 /* ================== PRODUKTY ================== */
 
 function renderProducts(){
-  container.innerHTML="";
+
+  container.innerHTML = "";
+
   products.forEach(p=>{
-    container.innerHTML+=`
+
+    container.innerHTML += `
       <div class="product">
         <h3>${p.name}</h3>
         <img src="${p.image}">
         <p>${p.price.toFixed(2)} zł</p>
-        <button onclick="openPopup('${p.id}')">Personalizuj</button>
+
+        <button onclick="openPopup('${p.id}')">
+          Personalizuj
+        </button>
       </div>
     `;
   });
 }
+
+/* ================== START ================== */
 
 renderProducts();
 renderCart();
