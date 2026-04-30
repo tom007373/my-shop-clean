@@ -24,17 +24,23 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
-/* ================== MULTER (TYLKO RAZ!) ================== */
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname);
-    }
-  })
+/* ================== MULTER ================== */
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadPath);
+  },
+
+  filename: (req, file, cb) => {
+    const safeName =
+      Date.now() +
+      "-" +
+      file.originalname.replace(/\s+/g, "_");
+
+    cb(null, safeName);
+  }
 });
+
+const upload = multer({ storage });
 
 /* ================== DB ================== */
 const pool = new Pool({
@@ -50,8 +56,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(uploadPath));
+
 /* ================== INIT DATABASE ================== */
 async function initDatabase() {
   try {
@@ -84,6 +93,7 @@ async function initDatabase() {
         id SERIAL PRIMARY KEY,
         description TEXT NOT NULL,
         main_file TEXT,
+        main_file_url TEXT,
         extra_files JSONB,
         status TEXT DEFAULT 'new',
         created_at TIMESTAMP DEFAULT NOW()
@@ -115,54 +125,94 @@ app.post("/newsletter", async (req, res) => {
   const { email } = req.body;
 
   if (!email || !email.includes("@")) {
-    return res.status(400).json({ error: "Nieprawidłowy email" });
+    return res.status(400).json({
+      error: "Nieprawidłowy email"
+    });
   }
 
   try {
     await pool.query(
-      "INSERT INTO newsletter (email) VALUES ($1) ON CONFLICT (email) DO NOTHING",
+      `INSERT INTO newsletter (email)
+       VALUES ($1)
+       ON CONFLICT (email) DO NOTHING`,
       [email]
     );
+
     res.json({ success: true });
+
   } catch (err) {
     console.error("❌ Newsletter error:", err.message);
-    res.status(500).json({ error: "Błąd zapisu" });
+    res.status(500).json({
+      error: "Błąd zapisu"
+    });
   }
 });
 
 /* ===== CUSTOM PROJECT UPLOAD ===== */
 app.post(
   "/project-upload",
+
   upload.fields([
     { name: "mainFile", maxCount: 1 },
     { name: "extraFiles", maxCount: 5 }
   ]),
+
   async (req, res) => {
     try {
       const { description } = req.body;
 
-      if (!description) {
-        return res.status(400).json({ error: "Brak opisu" });
+      if (!description || !description.trim()) {
+        return res.status(400).json({
+          error: "Brak opisu projektu"
+        });
       }
 
-      const mainFile =
-        req.files?.mainFile?.[0]?.filename || null;
+      const mainFileData =
+        req.files?.mainFile?.[0] || null;
 
-      const extraFiles = req.files?.extraFiles
-        ? req.files.extraFiles.map(f => f.filename)
-        : [];
+      const mainFile =
+        mainFileData?.filename || null;
+
+      const mainFileUrl =
+        mainFileData
+          ? `${process.env.DOMAIN}/uploads/${mainFileData.filename}`
+          : null;
+
+      const extraFiles =
+        req.files?.extraFiles
+          ? req.files.extraFiles.map(file => ({
+              filename: file.filename,
+              url: `${process.env.DOMAIN}/uploads/${file.filename}`
+            }))
+          : [];
 
       await pool.query(
-        `INSERT INTO custom_projects (description, main_file, extra_files)
-         VALUES ($1, $2, $3::jsonb)`,
-        [description, mainFile, JSON.stringify(extraFiles)]
+        `INSERT INTO custom_projects
+        (description, main_file, main_file_url, extra_files)
+        VALUES ($1, $2, $3, $4::jsonb)`,
+
+        [
+          description.trim(),
+          mainFile,
+          mainFileUrl,
+          JSON.stringify(extraFiles)
+        ]
       );
 
-      res.json({ success: true });
+      res.json({
+        success: true,
+        uploaded: {
+          mainFile,
+          mainFileUrl,
+          extraFiles
+        }
+      });
 
     } catch (err) {
-      console.error("❌ Project upload error:", err);
-      res.status(500).json({ error: "Błąd zapisu projektu" });
+      console.error("❌ Upload error:", err);
+      res.status(500).json({
+        error: "Błąd wysyłania plików"
+      });
     }
   }
 );
@@ -173,13 +223,17 @@ app.post("/checkout", async (req, res) => {
     const { customer, cart } = req.body;
 
     if (!customer || !cart || cart.length === 0) {
-      return res.status(400).json({ error: "Nieprawidłowe dane" });
+      return res.status(400).json({
+        error: "Nieprawidłowe dane"
+      });
     }
 
     const orderResult = await pool.query(
-      `INSERT INTO orders (email, name, phone, address, cart)
-       VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
-       RETURNING id`,
+      `INSERT INTO orders
+      (email, name, phone, address, cart)
+      VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+      RETURNING id`,
+
       [
         customer.email,
         customer.name,
@@ -194,25 +248,40 @@ app.post("/checkout", async (req, res) => {
     const line_items = cart.map(item => ({
       price_data: {
         currency: "pln",
-        product_data: { name: item.name },
+        product_data: {
+          name: item.name
+        },
         unit_amount: Math.round(item.price * 100)
       },
       quantity: item.quantity
     }));
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items,
-      success_url: `${process.env.DOMAIN}/success.html`,
-      cancel_url: `${process.env.DOMAIN}/cancel.html`,
-      metadata: { order_id: orderId }
-    });
+    const session =
+      await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items,
 
-    res.json({ url: session.url });
+        success_url:
+          `${process.env.DOMAIN}/success.html`,
+
+        cancel_url:
+          `${process.env.DOMAIN}/cancel.html`,
+
+        metadata: {
+          order_id: orderId
+        }
+      });
+
+    res.json({
+      url: session.url
+    });
 
   } catch (err) {
     console.error("❌ Checkout error:", err);
-    res.status(500).json({ error: "Błąd płatności" });
+
+    res.status(500).json({
+      error: "Błąd płatności"
+    });
   }
 });
 
@@ -223,5 +292,7 @@ app.listen(PORT, "0.0.0.0", () => {
 
 /* ================== SHUTDOWN ================== */
 process.on("SIGTERM", () => {
-  console.log("⚠️ SIGTERM from Railway (normal shutdown)");
+  console.log(
+    "⚠️ SIGTERM from Railway (normal shutdown)"
+  );
 });
