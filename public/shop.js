@@ -1,9 +1,9 @@
 /* ================== PRODUKTY ================== */
 
 const products = [
-  { id:"p1", name:"Brelok NFC – Personalizowany", price:2.00, image:"custom", type:"custom" },
+  { id:"p1", name:"Brelok NFC – Personalizowany", price:2.00, image:"custom.png", type:"custom" },
   { id:"p2", name:"Brelok NFC – Web Logo", price:29.99, image:"brelok.png", type:"ready" },
-  { id:"p3", name:"Brelok NFC – WiFi Logo", price:29.99, image:"wifi", type:"ready" },
+  { id:"p3", name:"Brelok NFC – WiFi Logo", price:29.99, image:"wifi.png", type:"ready" },
   { id:"p4", name:"Karta NFC – Personalizowana", price:29.99, image:"karta_nfc.png", type:"custom" }
 ];
 
