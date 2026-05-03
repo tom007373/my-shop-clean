@@ -55,6 +55,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+app.use("/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -216,7 +217,49 @@ app.post(
     }
   }
 );
+/* ===== STRIPE WEBHOOK ===== */
+app.post("/webhook", async (req, res) => {
+  let event;
 
+  try {
+    const signature = req.headers["stripe-signature"];
+
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+
+  } catch (err) {
+    console.error("❌ Webhook signature error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+
+    if (event.type === "checkout.session.completed") {
+
+      const session = event.data.object;
+
+      const orderId = session.metadata.order_id;
+
+      await pool.query(
+        `UPDATE orders
+         SET status = 'paid'
+         WHERE id = $1`,
+        [orderId]
+      );
+
+      console.log("✅ Order paid:", orderId);
+    }
+
+    res.json({ received: true });
+
+  } catch (err) {
+    console.error("❌ Webhook DB error:", err);
+    res.status(500).send("Server error");
+  }
+});
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
   try {
