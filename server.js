@@ -271,10 +271,15 @@ app.post("/checkout", async (req, res) => {
       });
     }
 
+    // 🔥 LICZENIE SUMY
+    const total = cart.reduce((sum, item) =>
+      sum + item.price * item.quantity, 0
+    );
+
     const orderResult = await pool.query(
       `INSERT INTO orders
-      (email, name, phone, address, cart)
-      VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+      (email, name, phone, address, cart, status)
+      VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, 'pending')
       RETURNING id`,
 
       [
