@@ -278,17 +278,18 @@ app.post("/checkout", async (req, res) => {
 
     const orderResult = await pool.query(
       `INSERT INTO orders
-      (email, name, phone, address, cart, status)
+      (email, name, phone, address, cart, status, total)
       VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, 'pending')
       RETURNING id`,
 
       [
-        customer.email,
-        customer.name,
-        customer.phone,
-        JSON.stringify(customer.address),
-        JSON.stringify(cart)
-      ]
+  customer.email,
+  customer.name,
+  customer.phone,
+  JSON.stringify(customer.address),
+  JSON.stringify(cart),
+  total
+]
     );
 
     const orderId = orderResult.rows[0].id;
