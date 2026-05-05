@@ -140,14 +140,6 @@ app.get("/admin/orders", async (req, res) => {
     res.status(500).json({ error: "Błąd pobierania zamówień" });
   }
 });
-
-    res.json(result.rows);
-
-  } catch (err) {
-    console.error("❌ Admin orders error:", err);
-    res.status(500).json({ error: "Błąd pobierania zamówień" });
-  }
-});
 /* ===== NEWSLETTER ===== */
 app.post("/newsletter", async (req, res) => {
   const { email } = req.body;
