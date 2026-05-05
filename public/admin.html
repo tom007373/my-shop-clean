@@ -13,20 +13,27 @@ body{
 }
 
 .order{
-  background:#1e1e1e;
-  margin-bottom:15px;
+  background:#1a1a1a;
   padding:15px;
+  margin-bottom:15px;
   border-radius:10px;
 }
 
-.paid{border-left:5px solid lime;}
-.pending{border-left:5px solid orange;}
-</style>
+.paid{ color:lime; }
+.pending{ color:orange; }
 
+pre{
+  background:#000;
+  padding:10px;
+  border-radius:8px;
+  overflow:auto;
+}
+</style>
 </head>
+
 <body>
 
-<h1>📦 Zamówienia</h1>
+<h1>Zamówienia</h1>
 
 <div id="orders"></div>
 
@@ -39,28 +46,30 @@ async function loadOrders(){
   const container = document.getElementById("orders");
   container.innerHTML = "";
 
-  orders.forEach(o => {
-
-    const cart = JSON.parse(o.cart);
-
-    let itemsHTML = "";
-    cart.forEach(item => {
-      itemsHTML += `
-        <div>
-          ${item.name} x${item.quantity} (${item.price} zł)
-          ${item.options?.logo ? `<br>📎 <a href="${item.options.logo}" target="_blank">Logo</a>` : ""}
-        </div>
-      `;
-    });
+  orders.forEach(order => {
 
     container.innerHTML += `
-      <div class="order ${o.status}">
-        <strong>ID:</strong> ${o.id}<br>
-        <strong>Status:</strong> ${o.status}<br>
-        <strong>Email:</strong> ${o.email}<br>
-        <strong>Suma:</strong> ${o.total || 0} zł<br><br>
+      <div class="order">
 
-        ${itemsHTML}
+        <h3>ID: ${order.id}</h3>
+
+        <p>
+          <strong>Status:</strong> 
+          <span class="${order.status}">
+            ${order.status}
+          </span>
+        </p>
+
+        <p><strong>Email:</strong> ${order.email}</p>
+        <p><strong>Telefon:</strong> ${order.phone}</p>
+
+        <p><strong>Suma:</strong> ${order.total || 0} zł</p>
+
+        <p><strong>Data:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+
+        <h4>Produkty:</h4>
+        <pre>${JSON.stringify(order.cart, null, 2)}</pre>
+
       </div>
     `;
   });
