@@ -105,9 +105,28 @@ async function loadOrders(){
           ${new Date(order.created_at).toLocaleString()}
         </p>
 
-        <h4>Produkty:</h4>
-        <pre>${JSON.stringify(order.cart, null, 2)}</pre>
+       <h4>Produkty:</h4>
+<div>
+  ${order.cart.map(item => {
 
+    const logo = item.options?.logo;
+
+    return `
+      <div style="margin-bottom:10px;">
+        <strong>${item.name}</strong><br>
+        Ilość: ${item.quantity}<br>
+
+        ${logo ? `
+          <a href="/uploads/${logo}" target="_blank">
+            🔗 Pobierz logo
+          </a>
+        ` : ""}
+
+        <hr>
+      </div>
+    `;
+  }).join("")}
+</div>
       </div>
     `;
   });
