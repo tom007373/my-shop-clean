@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Zamówienia</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#111;
+  color:#fff;
+  padding:20px;
+}
+
+.order{
+  background:#1e1e1e;
+  margin-bottom:15px;
+  padding:15px;
+  border-radius:10px;
+}
+
+.paid{border-left:5px solid lime;}
+.pending{border-left:5px solid orange;}
+</style>
+
+</head>
+<body>
+
+<h1>📦 Zamówienia</h1>
+
+<div id="orders"></div>
+
+<script>
+async function loadOrders(){
+
+  const res = await fetch("/admin/orders");
+  const orders = await res.json();
+
+  const container = document.getElementById("orders");
+  container.innerHTML = "";
+
+  orders.forEach(o => {
+
+    const cart = JSON.parse(o.cart);
+
+    let itemsHTML = "";
+    cart.forEach(item => {
+      itemsHTML += `
+        <div>
+          ${item.name} x${item.quantity} (${item.price} zł)
+          ${item.options?.logo ? `<br>📎 <a href="${item.options.logo}" target="_blank">Logo</a>` : ""}
+        </div>
+      `;
+    });
+
+    container.innerHTML += `
+      <div class="order ${o.status}">
+        <strong>ID:</strong> ${o.id}<br>
+        <strong>Status:</strong> ${o.status}<br>
+        <strong>Email:</strong> ${o.email}<br>
+        <strong>Suma:</strong> ${o.total || 0} zł<br><br>
+
+        ${itemsHTML}
+      </div>
+    `;
+  });
+}
+
+loadOrders();
+</script>
+
+</body>
+</html>

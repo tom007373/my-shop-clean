@@ -120,7 +120,19 @@ app.get("/ping", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+app.get("/admin/orders", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders ORDER BY created_at DESC"
+    );
 
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ Admin orders error:", err);
+    res.status(500).json({ error: "Błąd pobierania zamówień" });
+  }
+});
 /* ===== NEWSLETTER ===== */
 app.post("/newsletter", async (req, res) => {
   const { email } = req.body;
