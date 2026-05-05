@@ -77,6 +77,65 @@ async function loadOrders(){
 
 loadOrders();
 </script>
+<script>
 
+let ADMIN_TOKEN = localStorage.getItem("admin_token");
+
+async function login(){
+
+  const input = prompt("Podaj hasło admina:");
+
+  if(!input) return;
+
+  ADMIN_TOKEN = input;
+  localStorage.setItem("admin_token", input);
+
+  loadOrders();
+}
+
+async function loadOrders(){
+
+  if(!ADMIN_TOKEN){
+    return login();
+  }
+
+  const res = await fetch("/admin/orders", {
+    headers: {
+      "x-admin-token": ADMIN_TOKEN
+    }
+  });
+
+  if(res.status === 401){
+    alert("Złe hasło!");
+    localStorage.removeItem("admin_token");
+    return login();
+  }
+
+  const orders = await res.json();
+
+  const container = document.getElementById("orders");
+  container.innerHTML = "";
+
+  orders.forEach(order => {
+
+    container.innerHTML += `
+      <div class="order">
+
+        <h3>ID: ${order.id}</h3>
+
+        <p><strong>Status:</strong> ${order.status}</p>
+        <p><strong>Email:</strong> ${order.email}</p>
+        <p><strong>Suma:</strong> ${order.total || 0} zł</p>
+
+        <pre>${JSON.stringify(order.cart, null, 2)}</pre>
+
+      </div>
+    `;
+  });
+}
+
+loadOrders();
+
+</script>
 </body>
 </html>

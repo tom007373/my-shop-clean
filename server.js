@@ -121,10 +121,25 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 app.get("/admin/orders", async (req, res) => {
+
+  const token = req.headers["x-admin-token"];
+
+  if (token !== process.env.ADMIN_TOKEN) {
+    return res.status(401).json({ error: "Brak dostępu" });
+  }
+
   try {
     const result = await pool.query(
       "SELECT * FROM orders ORDER BY created_at DESC"
     );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ Admin orders error:", err);
+    res.status(500).json({ error: "Błąd pobierania zamówień" });
+  }
+});
 
     res.json(result.rows);
 
