@@ -171,12 +171,10 @@ app.post("/newsletter", async (req, res) => {
 /* ===== CUSTOM PROJECT UPLOAD ===== */
 app.post(
   "/project-upload",
-
   upload.fields([
     { name: "mainFile", maxCount: 1 },
     { name: "extraFiles", maxCount: 5 }
   ]),
-
   async (req, res) => {
     try {
       const { description } = req.body;
@@ -187,30 +185,27 @@ app.post(
         });
       }
 
-      const mainFileData =
-        req.files?.mainFile?.[0] || null;
+      const mainFileData = req.files?.mainFile?.[0] || null;
 
-      const mainFile =
-        mainFileData?.filename || null;
+      const mainFile = mainFileData?.filename || null;
 
-      const mainFileUrl =
-        mainFileData
-          ? `${process.env.DOMAIN}/uploads/${mainFileData.filename}`
-          : null;
+      const mainFileUrl = mainFileData
+        ? `${process.env.DOMAIN}/uploads/${mainFileData.filename}`
+        : null;
 
-      const extraFiles =
-        req.files?.extraFiles
-          ? req.files.extraFiles.map(file => ({
-              filename: file.filename,
-              url: `${process.env.DOMAIN}/uploads/${file.filename}`
-            }))
-          : [];
+      const extraFiles = req.files?.extraFiles
+        ? req.files.extraFiles.map(file => ({
+            filename: file.filename,
+            url: `${process.env.DOMAIN}/uploads/${file.filename}`
+          }))
+        : [];
 
-      await pool.query(
+      // ✅ JEDEN INSERT
+      const result = await pool.query(
         `INSERT INTO custom_projects
         (description, main_file, main_file_url, extra_files)
-        VALUES ($1, $2, $3, $4::jsonb)`,
-
+        VALUES ($1, $2, $3, $4::jsonb)
+        RETURNING id`,
         [
           description.trim(),
           mainFile,
@@ -219,12 +214,14 @@ app.post(
         ]
       );
 
+      const projectId = result.rows[0].id;
+
       res.json({
         success: true,
+        projectId,
         uploaded: {
           mainFile,
-          mainFileUrl,
-          extraFiles
+          mainFileUrl
         }
       });
 
@@ -282,7 +279,7 @@ app.post("/webhook", async (req, res) => {
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
   try {
-    const { customer, cart } = req.body;
+    const { customer, cart, projectId } = req.body;
 
     if (!customer || !cart || cart.length === 0) {
       return res.status(400).json({
@@ -297,10 +294,9 @@ app.post("/checkout", async (req, res) => {
 
     const orderResult = await pool.query(
   `INSERT INTO orders
-  (email, name, phone, address, cart, status, total)
-  VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6, $7)
+  (email, name, phone, address, cart, status, total, project_id)
+  VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6, $7, $8)
   RETURNING id`,
-
   [
     customer.email,
     customer.name,
@@ -308,7 +304,8 @@ app.post("/checkout", async (req, res) => {
     JSON.stringify(customer.address),
     JSON.stringify(cart),
     'pending',
-    total
+    total,
+    projectId || null
   ]
 );
 
