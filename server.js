@@ -122,7 +122,7 @@ app.get("/health", (req, res) => {
 });
 
 
-  const token = req.headers["x-admin-token"];
+  
 app.get("/admin/orders", async (req, res) => {
 
   const token = req.headers["x-admin-token"];
