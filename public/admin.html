@@ -106,7 +106,16 @@ async function loadOrders(){
         </p>
 
         <h4>Produkty:</h4>
-        <pre>${JSON.stringify(order.cart, null, 2)}</pre>
+<pre>${JSON.stringify(order.cart, null, 2)}</pre>
+
+${order.main_file_url ? `
+  <p>
+    <strong>Plik klienta:</strong><br>
+    <a href="${order.main_file_url}" target="_blank">
+      🔗 Otwórz plik
+    </a>
+  </p>
+` : ""}
 
       </div>
     `;

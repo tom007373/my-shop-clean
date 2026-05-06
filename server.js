@@ -120,6 +120,9 @@ app.get("/ping", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+
+  const token = req.headers["x-admin-token"];
 app.get("/admin/orders", async (req, res) => {
 
   const token = req.headers["x-admin-token"];
@@ -129,9 +132,15 @@ app.get("/admin/orders", async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      "SELECT * FROM orders ORDER BY created_at DESC"
-    );
+    const result = await pool.query(`
+      SELECT 
+        orders.*,
+        custom_projects.main_file_url
+      FROM orders
+      LEFT JOIN custom_projects
+      ON orders.project_id = custom_projects.id
+      ORDER BY orders.created_at DESC
+    `);
 
     res.json(result.rows);
 
@@ -279,7 +288,7 @@ app.post("/webhook", async (req, res) => {
 /* ===== CHECKOUT ===== */
 app.post("/checkout", async (req, res) => {
   try {
-    const { customer, cart, projectId } = req.body;
+    const { customer, cart, projectId = null } = req.body;
 
     if (!customer || !cart || cart.length === 0) {
       return res.status(400).json({
