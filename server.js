@@ -360,7 +360,7 @@ app.post("/checkout", async (req, res) => {
     total,
     projectId || null
   ]
-);
+;
 
     const orderId = orderResult.rows[0].id;
 
