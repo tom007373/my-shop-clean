@@ -19,13 +19,13 @@
     }
 
     a {
-      color: rgb(105, 59, 230);
+      
       text-decoration: none;
     }
 
     a:hover {
-      color: rgb(46, 224, 255);
-      text-decoration: underline;
+      
+      text-decoration: none;
     }
 
     /* ===== HEADER ===== */
@@ -33,7 +33,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgb(49, 41, 161)
+      background: linear-gradient(90deg, #72a3ff 0%, #3b50c7 40%, #3700ff 50%, #3b50c7 60%, #72a3ff 100%);
       padding: 15px 30px;
       flex-wrap: wrap;
     }
@@ -42,10 +42,23 @@
       width: 120px;
       height: auto;
     }
-
+    
     nav a {
       margin-left: 25px;
       font-size: 5rem;
+      background: linear-gradient(135deg, #d0d0d0 0%, #e8e8e8 45%, #a8a8a8 50%, #f0f0f0 55%, #888888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* Sprawia, że gradient jest widoczny jako kolor tekstu */
+  font-size: 5rem;
+  font-weight: bold;
+    }
+    nav a:hover{
+background: linear-gradient(135deg, #b9fdff 0%, #689dff 45%, #b9fdff 50%, #689dff 55%, #b9fdff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* Sprawia, że gradient jest widoczny jako kolor tekstu */
+  font-size: 5rem;
+  font-weight: bold;
+  
     }
 
     /* ===== HERO ===== */
@@ -57,7 +70,7 @@
 
     .hero img.base {
       width: 100%;
-      
+      border-radius: 20px;
       height: auto;
       display: block;
     }
@@ -70,7 +83,10 @@
       width: 280px;
       max-width: 80%;
     }
-
+    .hero img.overlay:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  transition: 0.5s;
+}
     /* ===== INFO BOXES ===== */
     .info {
       display: flex;
