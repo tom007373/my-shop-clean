@@ -77,23 +77,37 @@ async function initDatabase() {
     `);
 
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS orders (
-  id SERIAL PRIMARY KEY,
-  email TEXT,
-  name TEXT,
-  phone TEXT,
+  CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    email TEXT,
+    name TEXT,
+    phone TEXT,
+    address JSONB,
+    cart JSONB,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+`);
 
-  delivery_method TEXT,
-  inpost_locker TEXT,
+await pool.query(`
+  ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS total NUMERIC DEFAULT 0;
+`);
 
-  address JSONB,
-  cart JSONB,
+await pool.query(`
+  ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS project_id INTEGER;
+`);
 
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW()
-);
-    `);
+await pool.query(`
+  ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS delivery_method TEXT;
+`);
 
+await pool.query(`
+  ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS inpost_locker TEXT;
+`);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS custom_projects (
         id SERIAL PRIMARY KEY,
