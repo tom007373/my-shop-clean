@@ -33,7 +33,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(180deg, #008cff 0%, #3b50c7 40%, #3700ff 50%);
+      background: linear-gradient(180deg, #008cff 0%, #4e62d6 20%, #3700ff 70%);
       
       padding: 15px 30px;
       flex-wrap: wrap;
@@ -54,16 +54,41 @@
   font-weight: bold;
     }
     nav a:hover{
-background: linear-gradient(135deg, #b9dfff 0%, #689dff 45%, #b9fdff 50%, #689dff 55%, #b9fdff 100%);
+background: linear-gradient(
+    90deg,
+    #b9dfff,
+    #689dff,
+    #b9fdff,
+    #689dff,
+    #b9fdff
+  );
+
+  background-size: 400% 400%;
+
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent; /* Sprawia, że gradient jest widoczny jako kolor tekstu */
-  font-size: 5rem;
-  font-weight: bold;
-  
-    }
+  background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  animation: gradientFlow 10s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
     /* ===== HERO ===== */
     .hero {
+      background-color: blue;
       position: relative;
       width: 100%;
       border: 1px solid rgb(7, 0, 104);
@@ -94,7 +119,7 @@ background: linear-gradient(135deg, #b9dfff 0%, #689dff 45%, #b9fdff 50%, #689df
       gap: 20px;
       padding: 20px;
       flex-wrap: wrap;
-      background: linear-gradient(blue,black);
+      background: linear-gradient(blue ,black);
     }
 
     .info-box {
@@ -127,7 +152,7 @@ background: linear-gradient(135deg, #b9dfff 0%, #689dff 45%, #b9fdff 50%, #689df
 
     /* ===== FOOTER ===== */
     footer {
-      background: rgb(24,24,24);
+      background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #689dff);
       padding: 40px 20px;
       display: flex;
       flex-wrap: wrap;
