@@ -134,7 +134,33 @@
         oraz <a href="/terms.html">regulamin</a>
       </label>
     </div>
+    <h2>Sposób dostawy</h2>
 
+<label>
+  <div>
+  Kurier<input type="radio" name="delivery" value="courier" checked>
+  </div>
+</label>
+
+<label>
+  <div>
+  Paczkomat InPost<input type="radio" name="delivery" value="inpost">
+  </div>
+</label>
+
+<div id="inpostFields" style="display:none;">
+
+  <label>
+    Kod paczkomatu
+    <input type="text" id="locker_code">
+  </label>
+
+  <label>
+    Adres paczkomatu
+    <input type="text" id="locker_address">
+  </label>
+
+</div>
     <button type="submit">
       Przejdź do płatności
     </button>
@@ -143,45 +169,113 @@
 </main>
 
 <script>
-const projectId = localStorage.getItem("projectId");
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const deliveryRadios =
+  document.querySelectorAll('input[name="delivery"]');
+
+const inpostFields =
+  document.getElementById("inpostFields");
+
+deliveryRadios.forEach(radio => {
+
+  radio.addEventListener("change", () => {
+
+    const selected =
+      document.querySelector(
+        'input[name="delivery"]:checked'
+      ).value;
+
+    inpostFields.style.display =
+      selected === "inpost"
+        ? "block"
+        : "none";
+  });
+
+});
+
+const projectId =
+  localStorage.getItem("projectId");
+
+const cart =
+  JSON.parse(localStorage.getItem("cart")) || [];
 
 if (cart.length === 0) {
   alert("Koszyk jest pusty");
   window.location.href = "/shop.html";
 }
 
-const form = document.getElementById("checkout-form");
-const submitBtn = form.querySelector("button");
+const form =
+  document.getElementById("checkout-form");
+
+const submitBtn =
+  form.querySelector("button");
 
 form.addEventListener("submit", async (e) => {
+
   e.preventDefault();
 
-  // 🔒 blokada wielokrotnego kliknięcia
   submitBtn.disabled = true;
   submitBtn.textContent = "Przetwarzanie...";
 
+  const deliveryMethod =
+    document.querySelector(
+      'input[name="delivery"]:checked'
+    )?.value || "courier";
+
   const customer = {
-    name: document.getElementById("full_name").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
+
+    name:
+      document.getElementById("full_name").value.trim(),
+
+    email:
+      document.getElementById("email").value.trim(),
+
+    phone:
+      document.getElementById("phone").value.trim(),
+
+    deliveryMethod,
+
+    inpostLocker:
+      document.getElementById("locker_name")?.value.trim() || "",
+
     address: {
-      street: document.getElementById("street").value.trim(),
-      zip: document.getElementById("postal_code").value.trim(),
-      city: document.getElementById("city").value.trim(),
-      country: document.getElementById("country").value.trim()
+      street:
+        document.getElementById("street").value.trim(),
+
+      zip:
+        document.getElementById("postal_code").value.trim(),
+
+      city:
+        document.getElementById("city").value.trim(),
+
+      country:
+        document.getElementById("country").value.trim()
     }
   };
 
-  // 🔍 prosta walidacja
-  if (!customer.name || !customer.email || !customer.phone) {
+  if (
+    !customer.name ||
+    !customer.email ||
+    !customer.phone
+  ) {
     alert("Uzupełnij wszystkie dane!");
     submitBtn.disabled = false;
     submitBtn.textContent = "Przejdź do płatności";
     return;
   }
 
+  if (
+    customer.deliveryMethod === "inpost" &&
+    !customer.inpostLocker
+  ) {
+    alert("Podaj paczkomat InPost");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Przejdź do płatności";
+    return;
+  }
+
   try {
+
     const response = await fetch("/checkout", {
       method: "POST",
       headers: {
@@ -190,7 +284,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         customer,
         cart,
-        projectId: projectId || null // 🔥 KLUCZOWE
+        projectId: projectId || null
       })
     });
 
@@ -202,24 +296,33 @@ form.addEventListener("submit", async (e) => {
     }
 
     if (result.url) {
-      // 🧹 czyścimy dane po sukcesie
+
       localStorage.removeItem("cart");
       localStorage.removeItem("projectId");
 
       window.location.href = result.url;
+
     } else {
+
       alert("Nie udało się utworzyć sesji płatności");
+
     }
 
   } catch (err) {
+
     console.error("Checkout error:", err);
     alert("Błąd serwera");
 
   } finally {
+
     submitBtn.disabled = false;
-    submitBtn.textContent = "Przejdź do płatności";
+    submitBtn.textContent =
+      "Przejdź do płatności";
+
   }
+
 });
+
 </script>
 
 </body>

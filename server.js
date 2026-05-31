@@ -78,15 +78,20 @@ async function initDatabase() {
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
-        id SERIAL PRIMARY KEY,
-        email TEXT,
-        name TEXT,
-        phone TEXT,
-        address JSONB,
-        cart JSONB,
-        status TEXT DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT NOW()
-      );
+  id SERIAL PRIMARY KEY,
+  email TEXT,
+  name TEXT,
+  phone TEXT,
+
+  delivery_method TEXT,
+  inpost_locker TEXT,
+
+  address JSONB,
+  cart JSONB,
+
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW()
+);
     `);
 
     await pool.query(`
@@ -303,9 +308,48 @@ app.post("/checkout", async (req, res) => {
 
     const orderResult = await pool.query(
   `INSERT INTO orders
-  (email, name, phone, address, cart, status, total, project_id)
-  VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6, $7, $8)
+  (
+    email,
+    name,
+    phone,
+    delivery_method,
+    inpost_locker,
+    address,
+    cart,
+    status,
+    total,
+    project_id
+  )
+  VALUES
+  (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6::jsonb,
+    $7::jsonb,
+    $8,
+    $9,
+    $10
+  )
   RETURNING id`,
+  [
+    customer.email,
+    customer.name,
+    customer.phone,
+
+    customer.deliveryMethod,
+    customer.inpostLocker,
+
+    JSON.stringify(customer.address),
+    JSON.stringify(cart),
+
+    "pending",
+    total,
+    projectId || null
+  ]
+);
   [
     customer.email,
     customer.name,
