@@ -33,7 +33,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(90deg, #72a3ff 0%, #3b50c7 40%, #3700ff 50%, #3b50c7 60%, #72a3ff 100%);
+      background: linear-gradient(180deg, #008cff 0%, #3b50c7 40%, #3700ff 50%);
+      
       padding: 15px 30px;
       flex-wrap: wrap;
     }
@@ -53,7 +54,7 @@
   font-weight: bold;
     }
     nav a:hover{
-background: linear-gradient(135deg, #b9fdff 0%, #689dff 45%, #b9fdff 50%, #689dff 55%, #b9fdff 100%);
+background: linear-gradient(135deg, #b9dfff 0%, #689dff 45%, #b9fdff 50%, #689dff 55%, #b9fdff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; /* Sprawia, że gradient jest widoczny jako kolor tekstu */
   font-size: 5rem;
@@ -93,7 +94,7 @@ background: linear-gradient(135deg, #b9fdff 0%, #689dff 45%, #b9fdff 50%, #689df
       gap: 20px;
       padding: 20px;
       flex-wrap: wrap;
-
+      background: linear-gradient(blue,black);
     }
 
     .info-box {
@@ -106,7 +107,9 @@ background: linear-gradient(135deg, #b9fdff 0%, #689dff 45%, #b9fdff 50%, #689df
     }
 
     .info-box h2 {
-      color: cornflowerblue;
+      background: linear-gradient(135deg, #b9dfff 0%, #689dff 45%, #b9fdff 50%, #689dff 55%, #b9fdff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* Sprawia, że gradient jest widoczny jako kolor tekstu */
       font-size: 3rem;
       margin-bottom: 20px;
     }
@@ -144,6 +147,10 @@ background: linear-gradient(135deg, #b9fdff 0%, #689dff 45%, #b9fdff 50%, #689df
       margin-top: 10px;
       border-radius: 8px;
       border: none;
+      background-color: rgb(120, 120, 255);
+    }
+    .newsletter input::placeholder{
+      color: black;
     }
 
     .newsletter button {
