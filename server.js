@@ -108,6 +108,10 @@ await pool.query(`
   ALTER TABLE orders
   ADD COLUMN IF NOT EXISTS inpost_locker TEXT;
 `);
+await pool.query(`
+  ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS inpost_address TEXT;
+`);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS custom_projects (
         id SERIAL PRIMARY KEY,
