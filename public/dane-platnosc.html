@@ -235,8 +235,14 @@ form.addEventListener("submit", async (e) => {
 
     deliveryMethod,
 
-    inpostAddress:
-      document.getElementById("locker_name")?.value.trim() || "",
+     deliveryMethod,
+
+  inpostLocker:
+    document.getElementById("locker_name").value.trim(),
+
+  inpostAddress:
+    document.getElementById("locker_address").value.trim(),
+
 
     address: {
       street:
@@ -266,7 +272,7 @@ form.addEventListener("submit", async (e) => {
 
   if (
     customer.deliveryMethod === "inpost" &&
-    !customer.locker_name
+    !customer.inpostLocker
   ) {
     alert("Podaj paczkomat InPost");
     submitBtn.disabled = false;
