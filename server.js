@@ -360,7 +360,7 @@ app.post("/checkout", async (req, res) => {
   customer.phone,
 
   customer.deliveryMethod,
-  customer.inpostLocker,
+  customer.locker_name,
   customer.inpostAddress,
 
   JSON.stringify(customer.address),
