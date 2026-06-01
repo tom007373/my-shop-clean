@@ -93,8 +93,6 @@ async function loadOrders(){
         <p><strong>Email:</strong> ${order.email}</p>
         <p><strong>Telefon:</strong> ${order.phone}</p>
 
-        <p><strong>Telefon:</strong> ${order.phone}</p>
-
 <p>
   <strong>Dostawa:</strong>
   ${order.delivery_method || "brak"}
@@ -105,7 +103,12 @@ ${order.delivery_method === "inpost" ? `
     <strong>Paczkomat:</strong>
     ${order.inpost_locker || "-"}
   </p>
+  <p>
+    <strong>Paczkomat:</strong>
+    ${order.inpost_address || "-"}
+  </p>
 ` : ""}
+
 
 <p><strong>Adres:</strong><br>
   ${address.street || ""}<br>
