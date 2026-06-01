@@ -100,11 +100,12 @@ async function loadOrders(){
 
 ${order.delivery_method === "inpost" ? `
   <p>
-    <strong>Paczkomat:</strong>
-    ${order.inpost_name || "-"}
+    <strong>Kod paczkomatu:</strong>
+    ${order.inpost_locker || "-"}
   </p>
+
   <p>
-    <strong>Paczkomat:</strong>
+    <strong>Adres paczkomatu:</strong>
     ${order.inpost_address || "-"}
   </p>
 ` : ""}
