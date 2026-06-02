@@ -29,7 +29,7 @@
     }
 
     form {
-      background: rgb(7, 0, 104);
+      background: linear-gradient(to top, rgb(0, 17, 255), rgb(7, 0, 104));
       padding: 25px;
       border-radius: 20px;
     }
@@ -38,7 +38,7 @@
       display: block;
       margin-bottom: 15px;
       font-size: 0.95rem;
-      color: cadetblue;
+      color: rgb(0, 255, 242);
     }
 
     input {
@@ -76,7 +76,24 @@
       background: rgb(46, 224, 255);
     }
 
-    a { color: cornflowerblue; }
+    a { color: rgb(0, 225, 255); 
+      font-weight: bold;
+    }
+    .inpost{
+      background-color: rgb(251, 255, 0);
+      color: black;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 25px;
+      
+    }
+    .inpost input{
+      background-color: rgb(0, 0, 0);
+      color: white;
+      width: 90%;
+      margin-bottom: 10px;
+
+    }
   </style>
 </head>
 
@@ -128,7 +145,7 @@
 
     <div class="checkbox">
       <label>
-        <input type="checkbox" id="terms" required>
+        <input type="checkbox" id="terms" required >
         Akceptuję 
         <a href="/privacy.html">politykę prywatności</a> 
         oraz <a href="/terms.html">regulamin</a>
@@ -137,30 +154,33 @@
     <h2>Sposób dostawy</h2>
 
 <label>
-  <div>
+  <div style="text-align: center; font-size: 25px;">
   Kurier<input type="radio" name="delivery" value="courier" style="width: 10%;" checked>
   </div>
 </label>
-
-<label>
-  <div>
+<div class="inpost">
+<label class="inpost">
+  <div >
   Paczkomat InPost<input type="radio" name="delivery" value="inpost" style="width: 10%;">
   </div>
 </label>
 
 <div id="inpostFields" style="display:none;">
 
-  <label>
+  <label class="inpost">
     Kod paczkomatu
     <input type="text" id="locker_name">
   </label>
 
-  <label>
+  <label class="inpost">
     Adres paczkomatu
     <input type="text" id="locker_address" required>
   </label>
 
 </div>
+
+</div>
+
     <button type="submit">
       Przejdź do płatności
     </button>
