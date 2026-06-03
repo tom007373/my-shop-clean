@@ -11,6 +11,7 @@
    sodipodi:docname="OFERTA.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -28,12 +29,36 @@
      inkscape:cy="559.94696"
      inkscape:window-width="1920"
      inkscape:window-height="1057"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
-     id="defs1" />
+     id="defs1">
+    <linearGradient
+       id="linearGradient4"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop5" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop6" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4"
+       id="radialGradient6"
+       cx="105.30765"
+       cy="43.760273"
+       fx="105.30765"
+       fy="43.760273"
+       r="85.557564"
+       gradientTransform="matrix(1,0,0,0.35493224,0,28.228341)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
   <g
      inkscape:label="Warstwa 1"
      inkscape:groupmode="layer"
@@ -48,17 +73,17 @@
        ry="42.033962" />
     <text
        xml:space="preserve"
-       style="font-size:25.4px;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#cf0000;stroke:#2602ff;stroke-width:0;stroke-linecap:square;fill-opacity:1"
+       style="font-size:25.4px;font-family:Impact;-inkscape-font-specification:'Impact Condensed';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#cf0000;stroke:#2602ff;stroke-width:0;stroke-linecap:butt;fill-opacity:1;stroke-linejoin:miter;font-weight:normal;font-style:normal;font-stretch:condensed;font-variant:normal"
        x="104.87357"
        y="37.168427"
        id="text1"><tspan
          sodipodi:role="line"
          id="tspan1"
-         style="stroke-width:0;fill:#cf0000;fill-opacity:1"
+         style="stroke-width:0;fill:#cf0000;fill-opacity:1;stroke-linejoin:miter;stroke-linecap:butt;-inkscape-font-specification:'Impact Condensed';font-family:Impact;font-weight:normal;font-style:normal;font-stretch:condensed;font-variant:normal"
          x="104.87357"
          y="37.168427">SPRAWDŹ</tspan><tspan
          sodipodi:role="line"
-         style="stroke-width:0;fill:#cf0000;fill-opacity:1"
+         style="stroke-width:0;fill:#cf0000;fill-opacity:1;stroke-linejoin:miter;stroke-linecap:butt;-inkscape-font-specification:'Impact Condensed';font-family:Impact;font-weight:normal;font-style:normal;font-stretch:condensed;font-variant:normal"
          x="104.87358"
          y="68.918427"
          id="tspan2">NASZĄ OFERTĘ</tspan></text>
